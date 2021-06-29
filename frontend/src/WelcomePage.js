@@ -21,7 +21,11 @@ const WelcomePage = () => {
 
 	return (
 		<>
-			<p>{currentUser.email}</p>
+			<p>Welcome Page:</p>
+			<p>Logged in as: {currentUser.email}</p>
+
+			{error && <p>ERROR</p>}
+
 			<button onClick={handleLogout}>Logout</button>
 		</>
 	);

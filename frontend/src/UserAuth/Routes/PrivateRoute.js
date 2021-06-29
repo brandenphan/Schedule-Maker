@@ -1,6 +1,5 @@
-import React from "react";
 import { Route, Redirect } from "react-router-dom";
-import { useAuth } from "./UserAuth/context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 // This component ensures that a user is signed in before taking them to the Welcome page, if no user is signed in, it redirects the user to the login page
 const PrivateRoute = ({ component: Component, ...reset }) => {

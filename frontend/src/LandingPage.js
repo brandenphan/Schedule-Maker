@@ -5,6 +5,7 @@ const LandingPage = () => {
 
 	return (
 		<>
+			<p>Landing Page</p>
 			<button
 				onClick={() => {
 					history.push("/Login");
