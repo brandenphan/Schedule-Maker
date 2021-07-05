@@ -4,10 +4,11 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import AuthProvider from "./UserAuth/context/AuthContext";
 import PrivateRoute from "./UserAuth/Routes/PrivateRoute";
 import LoggedInRoute from "./UserAuth/Routes/LoggedInRoute";
+
 import Login from "./UserAuth/Login/Login";
 import Signup from "./UserAuth/Signup/Signup";
 import LandingPage from "./LandingPage";
-import WelcomePage from "./WelcomePage";
+import DashboardPage from "./Dashboard/Dashboard";
 import ForgotPassword from "./UserAuth/ForgotPassword/ForgotPassword";
 
 function App() {
@@ -25,8 +26,9 @@ function App() {
 					<Route exact path="/" component={LandingPage} />
 					<LoggedInRoute path="/Signup" component={Signup} />
 					<LoggedInRoute path="/Login" component={Login} />
-					<PrivateRoute path="/Welcome" component={WelcomePage} />
 					<Route path="/ForgotPassword" component={ForgotPassword} />
+
+					<PrivateRoute path="/Dashboard" component={DashboardPage} />
 				</AuthProvider>
 			</Switch>
 		</Router>

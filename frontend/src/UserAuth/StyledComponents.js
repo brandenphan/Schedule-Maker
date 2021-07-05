@@ -1,7 +1,6 @@
 import styled from "styled-components";
 
 export const BackgroundContainer = styled.div`
-	// background: linear-gradient(to left, #e0e0eb, #99b3ff);
 	background: linear-gradient(to left, #e0e0eb, #b3c6ff);
 	position: fixed;
 	width: 100%;

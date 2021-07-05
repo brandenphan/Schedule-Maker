@@ -40,7 +40,7 @@ const Login = () => {
 			setError("");
 			await login(emailRef.current.value, passwordRef.current.value);
 			setLoading(true);
-			history.push("/Welcome");
+			history.push("/Dashboard");
 		} catch (error) {
 			setError(error.message);
 		}

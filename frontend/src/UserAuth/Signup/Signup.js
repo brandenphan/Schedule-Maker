@@ -30,7 +30,7 @@ const Signup = () => {
 			setError("");
 			await signup(emailRef.current.value, passwordRef.current.value);
 			setLoading(true);
-			history.push("/Welcome");
+			history.push("/Dashboard");
 		} catch (error) {
 			setError(error.message);
 		}
