@@ -1,9 +1,10 @@
 import React from "react";
-import { Grid } from "@material-ui/core";
+import { Grid, Fade, Grow } from "@material-ui/core";
 // import { useAuth } from "../UserAuth/context/AuthContext";
 import styled from "styled-components";
 
 import SettingsMenu from "./SettingsMenu";
+import ScheduleCards from "./ScheduleCards";
 
 const BackgroundContainer = styled.div`
 	background: linear-gradient(to left, #e6e6f0, #e9edf7);
@@ -24,37 +25,36 @@ const Dashboard = () => {
 		<BackgroundContainer>
 			<Grid container>
 				<Grid item xs={12}>
-					<Grid
-						container
-						justify="flex-end"
-						style={{
-							marginTop: "1%",
-							marginLeft: "-2%",
-						}}
-					>
-						<SettingsMenu />
-					</Grid>
+					<Fade in={true} timeout={1000}>
+						<Grid
+							container
+							justify="flex-end"
+							style={{
+								marginTop: "1%",
+								marginLeft: "-2%",
+							}}
+						>
+							<SettingsMenu />
+						</Grid>
+					</Fade>
 				</Grid>
 				<Grid
 					item
 					xs={12}
 					style={{ padding: "2%", height: "92%", marginTop: "-2%" }}
 				>
-					<Grid
-						container
-						justify="center"
-						style={{
-							backgroundColor: "#f7f9fd",
-							borderRadius: "20px",
-							height: "100%",
-						}}
-					>
-						<p>HEY</p>
-						{/* <Grid item xs={3} style={{ backgroundColor: "black" }}></Grid>
-						<Grid item xs={3} style={{ backgroundColor: "blue" }}></Grid>
-						<Grid item xs={3} style={{ backgroundColor: "yellow" }}></Grid>
-						<Grid item xs={3} style={{ backgroundColor: "orange" }}></Grid> */}
-					</Grid>
+					<Grow in={true} timeout={1000}>
+						<Grid
+							container
+							justify="center"
+							style={{
+								backgroundColor: "#f7f9fd",
+								borderRadius: "20px",
+							}}
+						>
+							<ScheduleCards />
+						</Grid>
+					</Grow>
 				</Grid>
 			</Grid>
 		</BackgroundContainer>
