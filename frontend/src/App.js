@@ -10,6 +10,7 @@ import Signup from "./UserAuth/Signup/Signup";
 import LandingPage from "./LandingPage";
 import DashboardPage from "./Dashboard/Dashboard";
 import ForgotPassword from "./UserAuth/ForgotPassword/ForgotPassword";
+import SchedulePage from "./SchedulePage/SchedulePage";
 
 function App() {
 	// const [data, setData] = React.useState();
@@ -29,6 +30,7 @@ function App() {
 					<Route path="/ForgotPassword" component={ForgotPassword} />
 
 					<PrivateRoute path="/Dashboard" component={DashboardPage} />
+					<PrivateRoute path="/SchedulePage" component={SchedulePage} />
 				</AuthProvider>
 			</Switch>
 		</Router>
