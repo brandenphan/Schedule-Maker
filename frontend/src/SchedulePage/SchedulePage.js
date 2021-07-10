@@ -1,4 +1,4 @@
-import { Grid, Fade, Button } from "@material-ui/core";
+import { Grid, Fade, Button, Modal, Backdrop } from "@material-ui/core";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import SettingsMenu from "../Dashboard/SettingsMenu";
