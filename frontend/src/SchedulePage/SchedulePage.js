@@ -1,8 +1,19 @@
-import { Grid, Fade, Button, Modal, Backdrop } from "@material-ui/core";
+import React from "react";
+import {
+	Grid,
+	Fade,
+	Button,
+	Dialog,
+	DialogTitle,
+	DialogContent,
+	DialogActions,
+	IconButton,
+} from "@material-ui/core";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import SettingsMenu from "../Dashboard/SettingsMenu";
 import ScheduleTable from "./ScheduleTable";
+import AddItem from "./AddItem";
 
 const BackgroundContainer = styled.div`
 	background: linear-gradient(to left, #e6e6f0, #e9edf7);
@@ -18,6 +29,7 @@ const BackgroundContainer = styled.div`
 
 const SchedulePage = () => {
 	const history = useHistory();
+
 	return (
 		<BackgroundContainer>
 			<Grid container>
@@ -46,9 +58,7 @@ const SchedulePage = () => {
 								marginLeft: "-2%",
 							}}
 						>
-							<Button style={{ color: "#6a8fec", marginTop: "0.5%" }}>
-								Add Item
-							</Button>
+							<AddItem />
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 							<Button style={{ color: "#6a8fec", marginTop: "0.5%" }}>
 								Schedule Settings
@@ -61,7 +71,11 @@ const SchedulePage = () => {
 				<Grid
 					item
 					xs={12}
-					style={{ padding: "2%", height: "92%", marginTop: "-2%" }}
+					style={{
+						padding: "2%",
+						height: "92%",
+						marginTop: "-2%",
+					}}
 				>
 					<ScheduleTable />
 					&nbsp;
