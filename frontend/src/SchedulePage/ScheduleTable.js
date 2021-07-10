@@ -1,16 +1,16 @@
 import React from "react";
+import { Paper, Fade } from "@material-ui/core";
+import { ViewState } from "@devexpress/dx-react-scheduler";
 import {
-	Fade,
-	Table,
-	TableBody,
-	TableCell,
-	TableContainer,
-	TableHead,
-	TableRow,
-	Grid,
-} from "@material-ui/core";
+	Scheduler,
+	WeekView,
+	Appointments,
+	Toolbar,
+	DateNavigator,
+	TodayButton,
+} from "@devexpress/dx-react-scheduler-material-ui";
+import moment from "moment";
 import axios from "axios";
-// import mongoose from "mongoose";
 
 const getAppointmentsReducer = (state, action) => {
 	switch (action.type) {
@@ -39,6 +39,29 @@ const getAppointmentsReducer = (state, action) => {
 };
 
 const ScheduleTable = () => {
+	const dateObject = new Date(2021, 2, 1, 1);
+	const beginningDate = moment(dateObject);
+	let date = beginningDate.date;
+
+	const currentDate = moment();
+
+	const makeTodayAppointment = (startDate, endDate) => {
+		const days = moment(startDate).diff(endDate, "days");
+		const nextStartDate = moment(startDate)
+			.year(beginningDate.year())
+			.month(beginningDate.month())
+			.date(date);
+		const nextEndDate = moment(endDate)
+			.year(beginningDate.year())
+			.month(beginningDate.month())
+			.date(date + days);
+
+		return {
+			startDate: nextStartDate.toDate(),
+			endDate: nextEndDate.toDate(),
+		};
+	};
+
 	const [appointments, dispatchAppointments] = React.useReducer(
 		getAppointmentsReducer,
 		{ data: [], isLoading: true, isError: false }
@@ -48,10 +71,21 @@ const ScheduleTable = () => {
 		dispatchAppointments({ type: "DATA_LOADING" });
 		try {
 			const response = await axios.get("/scheduleData");
+			const appointmentsData = response.data.map(
+				({ startDate, endDate, ...restArgs }) => {
+					const result = {
+						...makeTodayAppointment(startDate, endDate),
+						...restArgs,
+					};
+					date += 1;
+					if (date > 31) date = 1;
+					return result;
+				}
+			);
 
 			dispatchAppointments({
 				type: "DATA_LOADING_SUCCESS",
-				payload: response.data,
+				payload: appointmentsData,
 			});
 		} catch {
 			dispatchAppointments({ type: "DATA_LOADING_FAILURE" });
@@ -64,46 +98,20 @@ const ScheduleTable = () => {
 	}, []);
 
 	return (
-		<Fade in={true} timeout={1500}>
-			<Grid container>
-				<Grid
-					item
-					xs={12}
-					style={{ backgroundColor: "#f7f9fd", borderRadius: "20px" }}
-				>
-					<TableContainer>
-						<Table>
-							<TableHead>
-								<TableRow>
-									<TableCell style={{ width: "2%", textAlign: "center" }} />
-									<TableCell style={{ width: "6%", textAlign: "center" }}>
-										Sunday
-									</TableCell>
-									<TableCell style={{ width: "6%", textAlign: "center" }}>
-										Monday
-									</TableCell>
-									<TableCell style={{ width: "6%", textAlign: "center" }}>
-										Tuesday
-									</TableCell>
-									<TableCell style={{ width: "6%", textAlign: "center" }}>
-										Wednesday
-									</TableCell>
-									<TableCell style={{ width: "6%", textAlign: "center" }}>
-										Thursday
-									</TableCell>
-									<TableCell style={{ width: "6%", textAlign: "center" }}>
-										Friday
-									</TableCell>
-									<TableCell style={{ width: "6%", textAlign: "center" }}>
-										Saturday
-									</TableCell>
-								</TableRow>
-							</TableHead>
-						</Table>
-					</TableContainer>
-				</Grid>
-			</Grid>
-		</Fade>
+		<>
+			<Fade in={true} timeout={1500}>
+				<Paper>
+					<Scheduler data={appointments.data}>
+						<ViewState defaultCurrentDate={currentDate} />
+						<WeekView startDayHour={9} endDayHour={19} excludedDays={[0, 6]} />
+						<Toolbar />
+						<DateNavigator />
+						<TodayButton />
+						<Appointments />
+					</Scheduler>
+				</Paper>
+			</Fade>
+		</>
 	);
 };
 
