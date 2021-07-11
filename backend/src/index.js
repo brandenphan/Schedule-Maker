@@ -18,7 +18,6 @@ try {
 }
 
 const scheduleSchema = mongoose.Schema({
-	id: mongoose.Schema.Types.ObjectId,
 	scheduleName: String,
 	scheduleEvents: Array,
 });
@@ -57,16 +56,18 @@ app.use(cors());
 app.use(express.json({ limit: "50mb", extended: true }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
+// post request to add a schedule
+
 app.post("/addScheduleEvent", (req, res) => {
 	const scheduleName = req.body.scheduleName;
 	const itemName = req.body.itemName;
 	const scheduleEventData = req.body.information;
 	const currentUser = req.body.currentUser;
-
+	
+	const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser); 
 	// console.log(scheduleEventData);
 	// console.log(currentUser);
 
-	const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser); // make this global to this file
 
 	// const schedule = new Schedule({
 	// 	id: new mongoose.Types.ObjectId(),
@@ -107,17 +108,53 @@ app.post("/addScheduleEvent", (req, res) => {
 	// 		console.log(error);
 	// 	});
 
+	let updatedEvents = [];
+
 	Schedule.find({ scheduleName: "TempName" })
 		.exec()
 		.then((data) => {
-			console.log(data[0].scheduleEvents);
+			// console.log(data[0].scheduleEvents);
 			// data.scheduleEvents.forEach((itemData) => {
 			// 	console.log(itemData);
 			// });
+			// let updatedEvents = [];
+
+			scheduleEventData.forEach((newData) => {
+				updatedEvents.push(newData);
+			})
+			data[0].scheduleEvents.forEach((itemData) => {
+				updatedEvents.push(itemData);
+			})
+
+			// console.log(updatedEvents); // move this stuff out so its not inside the find
+
+			// delete the document for this schedule and add with the updatedEvents array
+			// Schedule.deleteOne({scheduleName: "TempName"});
+
+			// const schedule = new Schedule({
+			// 	scheduleName: "TempName",
+			// 	scheduleEvents: updatedEvents,
+			// })
+
+			// schedule.save();
 		})
 		.catch((error) => {
 			console.log(error);
 		});
+
+		const schedule = new Schedule({
+			scheduleName: "TempName",
+			scheduleEvents: updatedEvents,
+		});
+
+		Schedule.deleteOne({scheduleName: "TempName"}).exec().then(() => {
+			console.log("Deleted successfully");
+		}).catch((error) => {
+			console.log(error);
+		})
+
+		schedule.save();
+
 
 	// schedule.save();
 
