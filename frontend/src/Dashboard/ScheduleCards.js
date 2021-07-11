@@ -9,8 +9,8 @@ import {
 	IconButton,
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
-import AddIcon from "@material-ui/icons/Add";
 import { useHistory } from "react-router-dom";
+import AddCard from "./AddCard";
 
 const ScheduleCards = () => {
 	const history = useHistory();
@@ -90,15 +90,7 @@ const ScheduleCards = () => {
 								marginTop: "7%",
 							}}
 						>
-							<CardActionArea
-								onClick={() => {
-									console.log("ADD");
-								}}
-							>
-								<CardContent>
-									<AddIcon />
-								</CardContent>
-							</CardActionArea>
+							<AddCard />
 						</Card>
 					</div>
 				</Grid>

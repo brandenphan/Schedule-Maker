@@ -61,7 +61,6 @@ const AddItem = () => {
 		} else if (startTimeValue >= endTimeValue) {
 			setError("End time must be later than start time");
 		} else {
-			setOpen(false);
 			let ScheduleItemsArray = [];
 
 			let startTimeString = startTime.replace(":", "");
@@ -179,15 +178,15 @@ const AddItem = () => {
 			axios
 				.post("/addScheduleEvent", {
 					scheduleName: "ScheduleName",
-					itemName: "TempName",
+					itemName: itemNameRef.current.value,
 					information: ScheduleItemsArray,
 					currentUser: currentUser.email,
 				})
-				.then((response) => {
-					console.log(response.data);
+				.then(() => {
+					setOpen(false);
 				})
 				.catch((error) => {
-					// console.log(error.message);
+					setError(error.response.statusText);
 				});
 		}
 	};
@@ -244,7 +243,7 @@ const AddItem = () => {
 								<Grid container justify="center">
 									<Alert
 										severity="error"
-										style={{ width: "100%", marginBottom: "1%" }}
+										style={{ width: "100%", marginBottom: "3%" }}
 									>
 										<AlertTitle>{error}</AlertTitle>
 									</Alert>

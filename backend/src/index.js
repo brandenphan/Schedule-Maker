@@ -7,13 +7,23 @@ const PORT = process.env.PORT || 3001;
 
 const app = express();
 
+// Headers
+app.use(cors());
+app.use(express.json({ limit: "50mb", extended: true }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+let databaseConnection;
+let successfulDatabaseConnection;
+
 try {
-	await mongoose.connect(
+	databaseConnection = await mongoose.connect(
 		`mongodb+srv://brandenphan:brandenphan2001@cluster0.ymxvc.mongodb.net/Schedule-Maker?retryWrites=true&w=majority`,
 		{ useNewUrlParser: true, useUnifiedTopology: true }
 	);
+	successfulDatabaseConnection = true;
 	console.log("Successfully connected to database");
 } catch (error) {
+	successfulDatabaseConnection = false;
 	console.log(error.message);
 }
 
@@ -22,143 +32,106 @@ const scheduleSchema = mongoose.Schema({
 	scheduleEvents: Array,
 });
 
-// const Schedule = mongoose.model(
-// 	"Schedule",
-// 	scheduleSchema,
-// 	"branden.phan@gmail.com"
-// );
-// const schedule = new Schedule({
-// 	_id: new mongoose.Types.ObjectId(),
-// 	scheduleName: "ScheduleName",
-// 	scheduleEvents: [
-// 		{
-// 			title: "Website Re-Design Plan",
-// 			startDate: new Date(2021, 7, 2, 9, 35),
-// 			endDate: new Date(2021, 7, 2, 11, 30),
-// 			id: 0,
-// 			rRule: "FREQ=WEEKLY;COUNT=1000",
-// 		},
-// 		{
-// 			title: "Math",
-// 			startDate: new Date(2021, 7, 2, 11, 35),
-// 			endDate: new Date(2021, 7, 2, 13, 30),
-// 			id: 1,
-// 			rRule: "FREQ=WEEKLY;COUNT=1000",
-// 		},
-// 	],
-// });
-// schedule.save();
+app.post("/addNewSchedule", async (req, res) => {
+	if (successfulDatabaseConnection === false) {
+		res.statusMessage = "Failed to connect to database, please try again later";
+		res.status(503).end();
+	} else {
+		const scheduleName = req.body.scheduleName;
+		const currentUser = req.body.currentUser;
 
-// mongoose.connection.close() or mongoose.disconnect() must give variable to connection for disconnect;
+		const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser);
 
-// Headers
-app.use(cors());
-app.use(express.json({ limit: "50mb", extended: true }));
-app.use(express.urlencoded({ limit: "50mb", extended: true }));
+		let duplicateName = false;
 
-// post request to add a schedule
+		await Schedule.find({})
+			.exec()
+			.then((data) => {
+				data.forEach((specificSchedule) => {
+					if (
+						scheduleName.toLowerCase() ===
+						specificSchedule.scheduleName.toLowerCase()
+					) {
+						duplicateName = true;
+					}
+				});
+			});
 
-app.post("/addScheduleEvent", (req, res) => {
-	const scheduleName = req.body.scheduleName;
-	const itemName = req.body.itemName;
-	const scheduleEventData = req.body.information;
-	const currentUser = req.body.currentUser;
-	
-	const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser); 
-	// console.log(scheduleEventData);
-	// console.log(currentUser);
+		if (duplicateName === true) {
+			res.statusMessage = "Duplicate Schedule name";
+			res.status(400).end();
+		} else {
+			const schedule = new Schedule({
+				scheduleName: scheduleName,
+				scheduleEvents: [],
+			});
+			schedule.save().then(() => {
+				console.log("New schedule saved");
+			});
+			res.send("New schedule sucessfully created");
+		}
+	}
+});
 
+app.post("/addScheduleEvent", async (req, res) => {
+	if (successfulDatabaseConnection === false) {
+		res.statusMessage = "Failed to connect to database, please try again later";
+		res.status(503).end();
+	} else {
+		const scheduleName = req.body.scheduleName;
+		const itemName = req.body.itemName;
+		const scheduleEventData = req.body.information;
+		const currentUser = req.body.currentUser;
 
-	// const schedule = new Schedule({
-	// 	id: new mongoose.Types.ObjectId(),
-	// 	scheduleName: scheduleName,
-	// 	scheduleEvents: scheduleEventData,
-	// });
+		const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser);
 
-	// console.log(Schedule.find({ scheduleName: "TempName" }).exec);
+		let duplicateTitle = false;
 
-	// Schedule.find({ scheduleName: "TempName" })
-	// 	.exec()
-	// 	.then((data) => {
-	// 		let scheduleEventsFromDatabase = data;
+		await Schedule.find({ scheduleName: scheduleName })
+			.exec()
+			.then((data) => {
+				data[0].scheduleEvents.forEach((itemData) => {
+					if (itemData.title.toLowerCase() === itemName.toLowerCase()) {
+						duplicateTitle = true;
+					}
+				});
+			});
 
-	// 		if (scheduleEventsFromDatabase.length === 0) {
-	// 			const schedule = new Schedule({
-	// 				id: new mongoose.Types.ObjectId(),
-	// 				scheduleName: scheduleName,
-	// 				scheduleEvents: scheduleEventData,
-	// 			});
-	// 			schedule
-	// 				.save()
-	// 				.exec()
-	// 				.then(() => {
-	// 					console.log("Save successsful");
-	// 				})
-	// 				.catch((error) => {
-	// 					console.log(error);
-	// 				});
-	// 		} else {
-	// 			console.log("EXIST");
-	// 			console.log(scheduleEventsFromDataBase);
-	// 		}
+		if (duplicateTitle === true) {
+			res.statusMessage = "Duplicate Item name";
+			res.status(400).end();
+		} else {
+			let updatedEvents = [];
+			await Schedule.find({ scheduleName: scheduleName })
+				.exec()
+				.then((data) => {
+					scheduleEventData.forEach((newData) => {
+						updatedEvents.push(newData);
+					});
 
-	// 		console.log(test[0].scheduleEvents);
-	// 	})
-	// 	.catch((error) => {
-	// 		console.log(error);
-	// 	});
+					data[0].scheduleEvents.forEach((itemData) => {
+						updatedEvents.push(itemData);
+					});
+				});
 
-	let updatedEvents = [];
+			await Schedule.deleteOne({ scheduleName: scheduleName })
+				.exec()
+				.then(() => {
+					console.log("Deleted successfully");
+				});
 
-	Schedule.find({ scheduleName: "TempName" })
-		.exec()
-		.then((data) => {
-			// console.log(data[0].scheduleEvents);
-			// data.scheduleEvents.forEach((itemData) => {
-			// 	console.log(itemData);
-			// });
-			// let updatedEvents = [];
+			const schedule = new Schedule({
+				scheduleName: scheduleName,
+				scheduleEvents: updatedEvents,
+			});
 
-			scheduleEventData.forEach((newData) => {
-				updatedEvents.push(newData);
-			})
-			data[0].scheduleEvents.forEach((itemData) => {
-				updatedEvents.push(itemData);
-			})
+			schedule.save().then(() => {
+				console.log("Saved successfully");
+			});
 
-			// console.log(updatedEvents); // move this stuff out so its not inside the find
-
-			// delete the document for this schedule and add with the updatedEvents array
-			// Schedule.deleteOne({scheduleName: "TempName"});
-
-			// const schedule = new Schedule({
-			// 	scheduleName: "TempName",
-			// 	scheduleEvents: updatedEvents,
-			// })
-
-			// schedule.save();
-		})
-		.catch((error) => {
-			console.log(error);
-		});
-
-		const schedule = new Schedule({
-			scheduleName: "TempName",
-			scheduleEvents: updatedEvents,
-		});
-
-		Schedule.deleteOne({scheduleName: "TempName"}).exec().then(() => {
-			console.log("Deleted successfully");
-		}).catch((error) => {
-			console.log(error);
-		})
-
-		schedule.save();
-
-
-	// schedule.save();
-
-	res.send("SUCCESS");
+			res.send("Item added successfully");
+		}
+	}
 });
 
 app.get("/api", (req, res) => {
