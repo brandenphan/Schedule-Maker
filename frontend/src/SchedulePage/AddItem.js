@@ -13,6 +13,8 @@ import {
 } from "@material-ui/core";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import CloseIcon from "@material-ui/icons/Close";
+import axios from "axios";
+import { useAuth } from "../UserAuth/context/AuthContext";
 
 const StyledSwitch = withStyles({
 	switchBase: {
@@ -29,11 +31,12 @@ const StyledSwitch = withStyles({
 })(Switch);
 
 const AddItem = () => {
+	const { currentUser } = useAuth();
 	const itemNameRef = React.useRef();
 	const [open, setOpen] = React.useState(false);
 	const [error, setError] = React.useState("");
 
-	const [startTime, setStartTime] = React.useState("9:30");
+	const [startTime, setStartTime] = React.useState("09:30");
 	const [endTime, setEndTime] = React.useState("10:30");
 
 	const [monday, setMonday] = React.useState(false);
@@ -44,6 +47,8 @@ const AddItem = () => {
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
+		let startTimeValue = parseInt(startTime.replace(":", ""));
+		let endTimeValue = parseInt(endTime.replace(":", ""));
 
 		if (
 			monday === false &&
@@ -53,22 +58,137 @@ const AddItem = () => {
 			friday === false
 		) {
 			setError("Please select at least one day for the item");
+		} else if (startTimeValue >= endTimeValue) {
+			setError("End time must be later than start time");
 		} else {
-			let test = startTime.replace(":", "");
-			test = parseInt(test);
-			console.log(test);
-
-			// Parse both times into ints, if the starttime is less than end time or equal dont add
-
-			console.log(itemNameRef.current.value);
-			console.log(startTime);
-			console.log(endTime);
-			console.log(monday);
-			console.log(tuesday);
-			console.log(wednesday);
-			console.log(thursday);
-			console.log(friday);
 			setOpen(false);
+			let ScheduleItemsArray = [];
+
+			let startTimeString = startTime.replace(":", "");
+			let startTimeHour = parseInt(startTimeString.substring(0, 2));
+			let startTimeMinute = parseInt(startTimeString.substring(2, 4));
+			let endTimeString = startTime.replace(":", "");
+			let endTimeHour = parseInt(endTimeString.substring(0, 2));
+			let endTimeMinute = parseInt(endTimeString.substring(2, 4));
+
+			if (monday === true) {
+				let mondayItem = {
+					title: itemNameRef.current.value,
+					startDate: {
+						year: 2021,
+						month: 7,
+						day: 1,
+						startTimeHourKey: startTimeHour,
+						startTimeMinuteKey: startTimeMinute,
+					},
+					endDate: {
+						year: 2021,
+						month: 7,
+						day: 1,
+						endTimeHourKey: endTimeHour,
+						endTimeMinuteKey: endTimeMinute,
+					},
+					rRule: "FREQ=WEEKLY;COUNT=1000",
+				};
+				ScheduleItemsArray.push(mondayItem);
+			}
+			if (tuesday === true) {
+				let tuesdayItem = {
+					title: itemNameRef.current.value,
+					startDate: {
+						year: 2021,
+						month: 7,
+						day: 2,
+						startTimeHourKey: startTimeHour,
+						startTimeMinuteKey: startTimeMinute,
+					},
+					endDate: {
+						year: 2021,
+						month: 7,
+						day: 2,
+						endTimeHourKey: endTimeHour,
+						endTimeMinuteKey: endTimeMinute,
+					},
+					rRule: "FREQ=WEEKLY;COUNT=1000",
+				};
+				ScheduleItemsArray.push(tuesdayItem);
+			}
+			if (wednesday === true) {
+				let wednesdayItem = {
+					title: itemNameRef.current.value,
+					startDate: {
+						year: 2021,
+						month: 7,
+						day: 3,
+						startTimeHourKey: startTimeHour,
+						startTimeMinuteKey: startTimeMinute,
+					},
+					endDate: {
+						year: 2021,
+						month: 7,
+						day: 3,
+						endTimeHourKey: endTimeHour,
+						endTimeMinuteKey: endTimeMinute,
+					},
+					rRule: "FREQ=WEEKLY;COUNT=1000",
+				};
+				ScheduleItemsArray.push(wednesdayItem);
+			}
+			if (thursday === true) {
+				let thursdayItem = {
+					title: itemNameRef.current.value,
+					startDate: {
+						year: 2021,
+						month: 7,
+						day: 4,
+						startTimeHourKey: startTimeHour,
+						startTimeMinuteKey: startTimeMinute,
+					},
+					endDate: {
+						year: 2021,
+						month: 7,
+						day: 4,
+						endTimeHourKey: endTimeHour,
+						endTimeMinuteKey: endTimeMinute,
+					},
+					rRule: "FREQ=WEEKLY;COUNT=1000",
+				};
+				ScheduleItemsArray.push(thursdayItem);
+			}
+			if (friday === true) {
+				let fridayItem = {
+					title: itemNameRef.current.value,
+					startDate: {
+						year: 2021,
+						month: 7,
+						day: 5,
+						startTimeHourKey: startTimeHour,
+						startTimeMinuteKey: startTimeMinute,
+					},
+					endDate: {
+						year: 2021,
+						month: 7,
+						day: 5,
+						endTimeHourKey: endTimeHour,
+						endTimeMinuteKey: endTimeMinute,
+					},
+					rRule: "FREQ-WEEKLY;COUNT=1000",
+				};
+				ScheduleItemsArray.push(fridayItem);
+			}
+			axios
+				.post("/addScheduleEvent", {
+					scheduleName: "ScheduleName",
+					itemName: "TempName",
+					information: ScheduleItemsArray,
+					currentUser: currentUser.email,
+				})
+				.then((response) => {
+					console.log(response.data);
+				})
+				.catch((error) => {
+					console.log(error.message);
+				});
 		}
 	};
 
@@ -83,6 +203,8 @@ const AddItem = () => {
 					setThursday(false);
 					setFriday(false);
 					setError("");
+					setStartTime("09:30");
+					setEndTime("10:30");
 				}}
 				style={{ color: "#6a8fec", marginTop: "0.5%" }}
 			>
@@ -141,6 +263,7 @@ const AddItem = () => {
 									name="ItemName"
 									label="Item Name"
 									inputRef={itemNameRef}
+									style={{ marginTop: "1%" }}
 								/>
 							</Grid>
 							<Grid item xs={6}>
@@ -152,9 +275,6 @@ const AddItem = () => {
 										defaultValue="09:30"
 										InputLabelProps={{
 											shrink: true,
-										}}
-										inputProps={{
-											step: 300,
 										}}
 										onChange={(event) => {
 											setStartTime(event.target.value);
@@ -173,9 +293,6 @@ const AddItem = () => {
 										InputLabelProps={{
 											shrink: true,
 										}}
-										inputProps={{
-											step: 300,
-										}}
 										onChange={(event) => {
 											setEndTime(event.target.value);
 										}}
@@ -183,8 +300,8 @@ const AddItem = () => {
 									/>
 								</Grid>
 							</Grid>
-							<Grid container justify="center">
-								<Grid item xs={2} style={{ marginTop: "6%" }}>
+							<Grid item xs={12}>
+								<Grid container justify="center" style={{ marginTop: "6%" }}>
 									<FormControlLabel
 										labelPlacement="top"
 										label="Monday"
@@ -198,8 +315,6 @@ const AddItem = () => {
 											/>
 										}
 									/>
-								</Grid>
-								<Grid item xs={2} style={{ marginTop: "6%" }}>
 									<FormControlLabel
 										labelPlacement="top"
 										label="Tuesday"
@@ -213,8 +328,6 @@ const AddItem = () => {
 											/>
 										}
 									/>
-								</Grid>
-								<Grid item xs={2} style={{ marginTop: "6%" }}>
 									<FormControlLabel
 										labelPlacement="top"
 										label="Wednesday"
@@ -228,8 +341,6 @@ const AddItem = () => {
 											/>
 										}
 									/>
-								</Grid>
-								<Grid item xs={2} style={{ marginTop: "6%" }}>
 									<FormControlLabel
 										labelPlacement="top"
 										label="Thursday"
@@ -243,8 +354,6 @@ const AddItem = () => {
 											/>
 										}
 									/>
-								</Grid>
-								<Grid item xs={2} style={{ marginTop: "6%" }}>
 									<FormControlLabel
 										labelPlacement="top"
 										label="Friday"

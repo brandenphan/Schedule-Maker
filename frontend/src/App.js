@@ -13,13 +13,6 @@ import ForgotPassword from "./UserAuth/ForgotPassword/ForgotPassword";
 import SchedulePage from "./SchedulePage/SchedulePage";
 
 function App() {
-	// const [data, setData] = React.useState();
-	// React.useEffect(() => {
-	// 	fetch("/api")
-	// 		.then((res) => res.json())
-	// 		.then((data) => setData(data.message));
-	// }, []);
-
 	return (
 		<Router>
 			<Switch>
