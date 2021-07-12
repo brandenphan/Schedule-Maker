@@ -50,6 +50,10 @@ const ScheduleCards = () => {
 	);
 	const [error, setError] = React.useState("");
 
+	let numberSchedules = 0;
+	let remainingGrids = 0;
+	let paddedGrids = 0;
+
 	const handleClick = (string) => {
 		console.log(string);
 	};
@@ -57,22 +61,26 @@ const ScheduleCards = () => {
 	const getUserSchedules = async () => {
 		dispatchUserScheduleData({ type: "DATA_LOADING" });
 		try {
-			const response = await axios.get("/getUserSchedule", {
-				currentUser: currentUser.email,
-			});
-
-			dispatchUserScheduleData({
-				type: "DATA_LOADING_SUCCESS",
-				payload: response.data,
-			});
-
 			await axios
 				.get("/getUserSchedule", { params: { currentUser: currentUser.email } })
 				.then((data) => {
-					console.log(data);
+					dispatchUserScheduleData({
+						type: "DATA_LOADING_SUCCESS",
+						payload: data.data,
+					});
+
+					numberSchedules = data.data.length + 1;
+					remainingGrids = numberSchedules % 4;
+					if (remainingGrids === 1) {
+						paddedGrids = 3;
+					} else if (remainingGrids === 2) {
+						paddedGrids = 2;
+					} else if (remainingGrids === 3) {
+						paddedGrids = 1;
+					}
 				})
 				.catch((error) => {
-					console.log(error.message);
+					setError(error.response.statusText);
 				});
 		} catch {
 			dispatchUserScheduleData({ type: "DATA_LOADING_FAILURE" });
@@ -84,8 +92,24 @@ const ScheduleCards = () => {
 	}, []);
 
 	return (
+		// finish this tmo
 		<>
-			<Zoom in={true} timeout={800}>
+			{userScheduleData.data.map((value) => {
+				console.log(value);
+				return (
+					<div key={value._id}>
+						<p>{value.scheduleName}</p>
+					</div>
+				);
+			})}
+			{/* {userScheduleData.data.forEach(() => {
+				return (
+					<Grid>
+						<p>HEY</p>
+					</Grid>
+				);
+			})} */}
+			{/* <Zoom in={true} timeout={800}>
 				<Grid item xs={3} style={{ borderRadius: "20px" }}>
 					<div
 						style={{
@@ -164,7 +188,7 @@ const ScheduleCards = () => {
 						</Card>
 					</div>
 				</Grid>
-			</Zoom>
+			</Zoom> */}
 			<Grid item xs={3}></Grid>
 		</>
 	);

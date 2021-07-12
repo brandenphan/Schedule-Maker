@@ -39,9 +39,14 @@ app.get("/getUserSchedule", async (req, res) => {
 		res.statusMessage = "Failed to connect to database, please try again later";
 		res.status(503).end();
 	} else {
-		const test = req.query.currentUser;
-		console.log(test);
-		res.send("HEY");
+		const currentUser = req.query.currentUser;
+		const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser);
+
+		await Schedule.find({ type: "TimeTable" })
+			.exec()
+			.then((data) => {
+				res.send(data);
+			});
 	}
 });
 
