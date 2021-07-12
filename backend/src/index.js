@@ -29,7 +29,20 @@ try {
 
 const scheduleSchema = mongoose.Schema({
 	scheduleName: String,
+	currentDate: String,
+	type: String,
 	scheduleEvents: Array,
+});
+
+app.get("/getUserSchedule", async (req, res) => {
+	if (successfulDatabaseConnection === false) {
+		res.statusMessage = "Failed to connect to database, please try again later";
+		res.status(503).end();
+	} else {
+		const test = req.query.currentUser;
+		console.log(test);
+		res.send("HEY");
+	}
 });
 
 app.post("/addNewSchedule", async (req, res) => {
@@ -38,10 +51,10 @@ app.post("/addNewSchedule", async (req, res) => {
 		res.status(503).end();
 	} else {
 		const scheduleName = req.body.scheduleName;
+		const currentDate = req.body.currentDate;
 		const currentUser = req.body.currentUser;
 
 		const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser);
-
 		let duplicateName = false;
 
 		await Schedule.find({})
@@ -63,6 +76,8 @@ app.post("/addNewSchedule", async (req, res) => {
 		} else {
 			const schedule = new Schedule({
 				scheduleName: scheduleName,
+				currentDate: currentDate,
+				type: "TimeTable",
 				scheduleEvents: [],
 			});
 			schedule.save().then(() => {
@@ -82,6 +97,7 @@ app.post("/addScheduleEvent", async (req, res) => {
 		const itemName = req.body.itemName;
 		const scheduleEventData = req.body.information;
 		const currentUser = req.body.currentUser;
+		const currentDate = req.body.currentDate;
 
 		const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser);
 
@@ -122,6 +138,8 @@ app.post("/addScheduleEvent", async (req, res) => {
 
 			const schedule = new Schedule({
 				scheduleName: scheduleName,
+				currentDate: currentDate,
+				type: "TimeTable",
 				scheduleEvents: updatedEvents,
 			});
 

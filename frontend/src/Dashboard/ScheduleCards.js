@@ -1,3 +1,4 @@
+import React from "react";
 import {
 	Grid,
 	Zoom,
@@ -11,9 +12,77 @@ import {
 import DeleteIcon from "@material-ui/icons/Delete";
 import { useHistory } from "react-router-dom";
 import AddCard from "./AddCard";
+import { useAuth } from "../UserAuth/context/AuthContext";
+import axios from "axios";
+
+const userSchedulesReducer = (state, action) => {
+	switch (action.type) {
+		case "DATA_LOADING":
+			return {
+				...state,
+				isLoading: true,
+				isError: false,
+			};
+		case "DATA_LOADING_SUCCESS":
+			return {
+				...state,
+				isLoading: false,
+				isError: false,
+				data: action.payload,
+			};
+		case "DATA_LOADING_FAILURE":
+			return {
+				...state,
+				isLoading: false,
+				isError: true,
+			};
+		default:
+			throw new Error();
+	}
+};
 
 const ScheduleCards = () => {
 	const history = useHistory();
+	const { currentUser } = useAuth();
+	const [userScheduleData, dispatchUserScheduleData] = React.useReducer(
+		userSchedulesReducer,
+		{ data: [], isLoading: true, isError: false }
+	);
+	const [error, setError] = React.useState("");
+
+	const handleClick = (string) => {
+		console.log(string);
+	};
+
+	const getUserSchedules = async () => {
+		dispatchUserScheduleData({ type: "DATA_LOADING" });
+		try {
+			const response = await axios.get("/getUserSchedule", {
+				currentUser: currentUser.email,
+			});
+
+			dispatchUserScheduleData({
+				type: "DATA_LOADING_SUCCESS",
+				payload: response.data,
+			});
+
+			await axios
+				.get("/getUserSchedule", { params: { currentUser: currentUser.email } })
+				.then((data) => {
+					console.log(data);
+				})
+				.catch((error) => {
+					console.log(error.message);
+				});
+		} catch {
+			dispatchUserScheduleData({ type: "DATA_LOADING_FAILURE" });
+		}
+	};
+
+	React.useEffect(() => {
+		getUserSchedules();
+	}, []);
+
 	return (
 		<>
 			<Zoom in={true} timeout={800}>
@@ -26,6 +95,7 @@ const ScheduleCards = () => {
 						<Card>
 							<CardActionArea
 								onClick={() => {
+									handleClick("Name"); // This will be dynamic based on the card on click set the context equal to this figure context out after
 									history.push("/SchedulePage");
 								}}
 							>

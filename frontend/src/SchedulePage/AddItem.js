@@ -13,6 +13,7 @@ import {
 } from "@material-ui/core";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import CloseIcon from "@material-ui/icons/Close";
+import moment from "moment";
 import axios from "axios";
 import { useAuth } from "../UserAuth/context/AuthContext";
 
@@ -35,6 +36,7 @@ const AddItem = () => {
 	const itemNameRef = React.useRef();
 	const [open, setOpen] = React.useState(false);
 	const [error, setError] = React.useState("");
+	const currentDate = moment().format("LLLL");
 
 	const [startTime, setStartTime] = React.useState("09:30");
 	const [endTime, setEndTime] = React.useState("10:30");
@@ -181,6 +183,7 @@ const AddItem = () => {
 					itemName: itemNameRef.current.value,
 					information: ScheduleItemsArray,
 					currentUser: currentUser.email,
+					currentDate: currentDate,
 				})
 				.then(() => {
 					setOpen(false);

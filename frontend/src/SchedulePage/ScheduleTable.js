@@ -103,7 +103,7 @@ const ScheduleTable = () => {
 				<Paper>
 					<Scheduler data={appointments.data}>
 						<ViewState defaultCurrentDate={currentDate} />
-						<WeekView startDayHour={9} endDayHour={19} excludedDays={[0, 6]} />
+						<WeekView startDayHour={8} endDayHour={19} excludedDays={[0, 6]} />
 						<Toolbar />
 						<DateNavigator />
 						<TodayButton />
