@@ -32,6 +32,8 @@ const Dashboard = () => {
 		resetCurrentSchedule();
 	}, []);
 
+	axios.get("/test/test").then((data) => console.log(data));
+
 	return (
 		<BackgroundContainer>
 			<Grid container>

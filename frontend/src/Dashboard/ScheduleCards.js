@@ -168,44 +168,42 @@ const ScheduleCards = () => {
 			) : (
 				<>
 					{userScheduleData.data.map((value) => (
-						<>
-							<Zoom in={true} timeout={800} key={value.scheduleName}>
-								<Grid item xs={3} style={{ borderRadius: "20px" }}>
-									<div
-										style={{
-											padding: "5%",
-										}}
-									>
-										<Card>
-											<CardActionArea
+						<Zoom in={true} timeout={800} key={value.scheduleName}>
+							<Grid item xs={3} style={{ borderRadius: "20px" }}>
+								<div
+									style={{
+										padding: "5%",
+									}}
+								>
+									<Card>
+										<CardActionArea
+											onClick={() => {
+												handleScheduleClick(value.scheduleName);
+											}}
+										>
+											<CardContent>
+												<Typography variant="h6">
+													{value.scheduleName}
+												</Typography>
+												<Typography style={{ marginTop: "2%" }}>
+													Date Modified: {value.currentDate}
+												</Typography>
+											</CardContent>
+										</CardActionArea>
+										<CardActions style={{ float: "right", marginTop: "-3%" }}>
+											<IconButton
 												onClick={() => {
-													handleScheduleClick(value.scheduleName);
+													setOpen(true);
+													setScheduleToDelete(value.scheduleName);
 												}}
 											>
-												<CardContent>
-													<Typography variant="h6">
-														{value.scheduleName}
-													</Typography>
-													<Typography style={{ marginTop: "2%" }}>
-														Date Modified: {value.currentDate}
-													</Typography>
-												</CardContent>
-											</CardActionArea>
-											<CardActions style={{ float: "right", marginTop: "-3%" }}>
-												<IconButton
-													onClick={() => {
-														setOpen(true);
-														setScheduleToDelete(value.scheduleName);
-													}}
-												>
-													<DeleteIcon />
-												</IconButton>
-											</CardActions>
-										</Card>
-									</div>
-								</Grid>
-							</Zoom>
-						</>
+												<DeleteIcon />
+											</IconButton>
+										</CardActions>
+									</Card>
+								</div>
+							</Grid>
+						</Zoom>
 					))}
 					<Zoom in={true} timeout={800}>
 						<Grid

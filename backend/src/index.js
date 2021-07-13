@@ -9,6 +9,9 @@ const app = express();
 
 dotenv.config();
 
+import persistenceRoute from "./persistence.js";
+app.use("/test", persistenceRoute);
+
 // Headers
 app.use(cors());
 app.use(express.json({ limit: "50mb", extended: true }));
@@ -29,6 +32,11 @@ try {
 	console.log(error.message);
 }
 
+const userSettingsSchema = mongoose.Schema({
+	darkMode: Boolean,
+	type: String,
+});
+
 const scheduleSchema = mongoose.Schema({
 	scheduleName: String,
 	currentDate: String,
@@ -36,12 +44,35 @@ const scheduleSchema = mongoose.Schema({
 	scheduleEvents: Array,
 });
 
-const schedulePersistence = mongoose.Schema({
+const schedulePersistenceSchema = mongoose.Schema({
 	currentSchedule: String,
 	type: String,
 });
 
-// post requests for type: user settings, for user settings, work on that next, dark mode and resetting password
+app.post("/setUserSettings", async (req, res) => {
+	if (successfulDatabaseConnection === false) {
+		res.statusMessage = "Failed to connect to database, please try again later";
+		res.status(503).end();
+	} else {
+		const currentUser = req.body.currentUser;
+		const darkModeBoolean = req.body.darkModeBoolean;
+		const Settings = mongoose.model(
+			"UserSettings",
+			userSettingsSchema,
+			currentUser
+		);
+
+		await Settings.deleteMany({ type: "UserSettings" });
+
+		const newSettings = Settings({
+			darkMode: darkModeBoolean,
+			type: "UserSettings",
+		});
+		newSettings.save();
+
+		res.send("Updated user profile successfully");
+	}
+});
 
 app.post("/resetCurrentSchedulePersistence", async (req, res) => {
 	if (successfulDatabaseConnection === false) {
@@ -51,7 +82,7 @@ app.post("/resetCurrentSchedulePersistence", async (req, res) => {
 		const currentUser = req.body.currentUser;
 		const Persistence = mongoose.model(
 			"Persistence",
-			schedulePersistence,
+			schedulePersistenceSchema,
 			currentUser
 		);
 
@@ -76,7 +107,7 @@ app.post("/setCurrentSchedulePersistence", async (req, res) => {
 		const currentSchedule = req.body.scheduleName;
 		const Persistence = mongoose.model(
 			"Persistence",
-			schedulePersistence,
+			schedulePersistenceSchema,
 			currentUser
 		);
 
@@ -100,7 +131,7 @@ app.get("/getUserPersistence", async (req, res) => {
 		const currentUser = req.query.currentUser;
 		const Persistence = mongoose.model(
 			"Persistence",
-			schedulePersistence,
+			schedulePersistenceSchema,
 			currentUser
 		);
 
