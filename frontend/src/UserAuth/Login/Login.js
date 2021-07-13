@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Avatar, Typography } from "@material-ui/core";
+import { Grid, Avatar, Typography, Grow } from "@material-ui/core";
 import LockIcon from "@material-ui/icons/Lock";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import { useHistory } from "react-router-dom";
@@ -49,50 +49,52 @@ const Login = () => {
 	return (
 		<>
 			<BackgroundContainer>
-				<Grid container>
-					<Grid item xs={12}>
-						<Grid container justify="center">
-							<FormContainer>
-								<br />
-								<br />
-								<CenteredDiv>
-									<Avatar>
-										<LockIcon htmlColor="#8a7aff" />
-									</Avatar>
-								</CenteredDiv>
+				<Grow in={true} timeout={800}>
+					<Grid container>
+						<Grid item xs={12}>
+							<Grid container justify="center">
+								<FormContainer>
+									<br />
+									<br />
+									<CenteredDiv>
+										<Avatar>
+											<LockIcon htmlColor="#8a7aff" />
+										</Avatar>
+									</CenteredDiv>
 
-								<br />
-								<Typography
-									align="center"
-									variant="h4"
-									style={{ fontFamily: "Source Sans Pro" }}
-								>
-									<b>Login</b>
-								</Typography>
+									<br />
+									<Typography
+										align="center"
+										variant="h4"
+										style={{ fontFamily: "Source Sans Pro" }}
+									>
+										<b>Login</b>
+									</Typography>
 
-								{error && (
-									<>
-										<br />
-										<br />
-										<Alert severity="error">
-											<AlertTitle>Error</AlertTitle>
-											{error}
-										</Alert>
-									</>
-								)}
+									{error && (
+										<>
+											<br />
+											<br />
+											<Alert severity="error">
+												<AlertTitle>Error</AlertTitle>
+												{error}
+											</Alert>
+										</>
+									)}
 
-								<LoginForm
-									loading={loading}
-									emailRef={emailRef}
-									passwordRef={passwordRef}
-									check={check}
-									handleCheckboxChange={handleCheckboxChange}
-									handleSubmit={handleSubmit}
-								/>
-							</FormContainer>
+									<LoginForm
+										loading={loading}
+										emailRef={emailRef}
+										passwordRef={passwordRef}
+										check={check}
+										handleCheckboxChange={handleCheckboxChange}
+										handleSubmit={handleSubmit}
+									/>
+								</FormContainer>
+							</Grid>
 						</Grid>
 					</Grid>
-				</Grid>
+				</Grow>
 			</BackgroundContainer>
 		</>
 	);

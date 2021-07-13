@@ -1,11 +1,13 @@
 import express from "express";
 import cors from "cors";
-
 import mongoose from "mongoose";
+import dotenv from "dotenv";
 
 const PORT = process.env.PORT || 3001;
 
 const app = express();
+
+dotenv.config();
 
 // Headers
 app.use(cors());
@@ -16,10 +18,10 @@ let databaseConnection;
 let successfulDatabaseConnection;
 
 try {
-	databaseConnection = await mongoose.connect(
-		`mongodb+srv://brandenphan:brandenphan2001@cluster0.ymxvc.mongodb.net/Schedule-Maker?retryWrites=true&w=majority`,
-		{ useNewUrlParser: true, useUnifiedTopology: true }
-	);
+	databaseConnection = await mongoose.connect(process.env.DB, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+	});
 	successfulDatabaseConnection = true;
 	console.log("Successfully connected to database");
 } catch (error) {
@@ -32,6 +34,82 @@ const scheduleSchema = mongoose.Schema({
 	currentDate: String,
 	type: String,
 	scheduleEvents: Array,
+});
+
+const schedulePersistence = mongoose.Schema({
+	currentSchedule: String,
+	type: String,
+});
+
+// post requests for type: user settings, for user settings, work on that next, dark mode and resetting password
+
+app.post("/resetCurrentSchedulePersistence", async (req, res) => {
+	if (successfulDatabaseConnection === false) {
+		res.statusMessage = "Failed to connect to database, please try again later";
+		res.status(503).end();
+	} else {
+		const currentUser = req.body.currentUser;
+		const Persistence = mongoose.model(
+			"Persistence",
+			schedulePersistence,
+			currentUser
+		);
+
+		await Persistence.deleteMany({ type: "Persistence" });
+
+		const newPersistence = new Persistence({
+			currentSchedule: "",
+			type: "Persistence",
+		});
+		newPersistence.save();
+
+		res.send("Updated user persistence successfully");
+	}
+});
+
+app.post("/setCurrentSchedulePersistence", async (req, res) => {
+	if (successfulDatabaseConnection === false) {
+		res.statusMessage = "Failed to connect to database, please try again later";
+		res.status(503).end();
+	} else {
+		const currentUser = req.body.currentUser;
+		const currentSchedule = req.body.scheduleName;
+		const Persistence = mongoose.model(
+			"Persistence",
+			schedulePersistence,
+			currentUser
+		);
+
+		await Persistence.deleteMany({ type: "Persistence" });
+
+		const newPersistence = new Persistence({
+			currentSchedule: currentSchedule,
+			type: "Persistence",
+		});
+		newPersistence.save();
+
+		res.send("Updated user persistence successfully");
+	}
+});
+
+app.get("/getUserPersistence", async (req, res) => {
+	if (successfulDatabaseConnection === false) {
+		res.statusMessage = "Failed to connect to database, please try again later";
+		res.status(503).end();
+	} else {
+		const currentUser = req.query.currentUser;
+		const Persistence = mongoose.model(
+			"Persistence",
+			schedulePersistence,
+			currentUser
+		);
+
+		await Persistence.find({ type: "Persistence" })
+			.exec()
+			.then((data) => {
+				res.send(data[0].currentSchedule);
+			});
+	}
 });
 
 app.get("/getUserSchedules", async (req, res) => {
@@ -50,15 +128,20 @@ app.get("/getUserSchedules", async (req, res) => {
 	}
 });
 
-// Make sure the a user information is stored within the database upon login and signup first
-// app.get("getCurrentUserSchedule", async (req, res) => {
-// 	if (successfulDatabaseConnection === false) {
-// 		res.statusMessage = "Failed to connect to database, please try again later";
-// 		res.status(503).end();
-// 	} else {
-// 		const currentUser = req.query.currentUser;
-// 	}
-// });
+app.delete("/deleteUserSchedule", async (req, res) => {
+	if (successfulDatabaseConnection === false) {
+		res.statusMessage = "Failed to connect to database, please try again later";
+		res.status(503).end();
+	} else {
+		const currentUser = req.body.currentUser;
+		const scheduleName = req.body.scheduleName;
+
+		const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser);
+		await Schedule.deleteMany({ scheduleName: scheduleName });
+
+		res.send("Successfully deleted schedule");
+	}
+});
 
 app.post("/addNewSchedule", async (req, res) => {
 	if (successfulDatabaseConnection === false) {
@@ -72,7 +155,7 @@ app.post("/addNewSchedule", async (req, res) => {
 		const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser);
 		let duplicateName = false;
 
-		await Schedule.find({})
+		await Schedule.find({ type: "TimeTable" })
 			.exec()
 			.then((data) => {
 				data.forEach((specificSchedule) => {
@@ -100,6 +183,45 @@ app.post("/addNewSchedule", async (req, res) => {
 			});
 			res.send("New schedule sucessfully created");
 		}
+	}
+});
+
+app.get("/getScheduleInformation", async (req, res) => {
+	if (successfulDatabaseConnection === false) {
+		res.statusMessage = "Failed to connect to database, please try again later";
+		res.status(503).end();
+	} else {
+		const currentUser = req.query.currentUser;
+		const currentSchedule = req.query.currentSchedule;
+		let scheduleInformation = [];
+
+		const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser);
+		Schedule.find({ scheduleName: currentSchedule })
+			.exec()
+			.then((data) => {
+				data[0].scheduleEvents.forEach((eachItem) => {
+					let eachItemValues = {
+						title: eachItem.title,
+						startDate: new Date(
+							eachItem.startDate.year,
+							eachItem.startDate.month,
+							eachItem.startDate.day,
+							eachItem.startDate.startTimeHourKey,
+							eachItem.startDate.startTimeMinuteKey
+						),
+						endDate: new Date(
+							eachItem.endDate.year,
+							eachItem.endDate.month,
+							eachItem.endDate.day,
+							eachItem.endDate.endTimeHourKey,
+							eachItem.endDate.endTimeMinuteKey
+						),
+						rRule: eachItem.rRule,
+					};
+					scheduleInformation.push(eachItemValues);
+				});
+				res.send(scheduleInformation);
+			});
 	}
 });
 
@@ -165,49 +287,6 @@ app.post("/addScheduleEvent", async (req, res) => {
 			res.send("Item added successfully");
 		}
 	}
-});
-
-app.get("/api", (req, res) => {
-	res.json({ message: "Hello from Server!" });
-});
-
-app.get("/scheduleData", (req, res) => {
-	res.json([
-		{
-			title: "Website Re-Design Plan",
-			startDate: new Date(2021, 7, 1, 9, 35),
-			endDate: new Date(2021, 7, 1, 11, 30),
-			id: 0,
-			rRule: "FREQ=WEEKLY;COUNT=1000",
-		},
-		{
-			title: "Website Re-Design Plan",
-			startDate: new Date(2021, 7, 4, 9, 35),
-			endDate: new Date(2021, 7, 4, 11, 30),
-			id: 1,
-			rRule: "FREQ=WEEKLY;COUNT=1000",
-		},
-		{
-			title: "Math",
-			startDate: new Date(2021, 7, 5, 11, 35),
-			endDate: new Date(2021, 7, 5, 13, 30),
-			id: 1,
-			rRule: "FREQ=WEEKLY;COUNT=1000",
-		},
-
-		// {
-		// 	title: "Book Flights to San Fran for Sales Trip",
-		// 	startDate: new Date(2018, 5, 25, 12, 11),
-		// 	endDate: new Date(2018, 5, 25, 13, 0),
-		// 	id: 1,
-		// },
-		// {
-		// 	title: "Install New Router in Dev Room",
-		// 	startDate: new Date(2018, 5, 25, 14, 30),
-		// 	endDate: new Date(2018, 5, 25, 15, 35),
-		// 	id: 2,
-		// },
-	]);
 });
 
 app.listen(PORT, () => {

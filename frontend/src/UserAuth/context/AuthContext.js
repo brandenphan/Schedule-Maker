@@ -9,7 +9,6 @@ export const useAuth = () => {
 
 const AuthProvider = ({ children }) => {
 	const [currentUser, setCurrentUser] = React.useState();
-	const [currentSchedule, changeCurrentSchedule] = React.useState();
 	const [loading, setLoading] = React.useState(true);
 
 	const signup = (email, password) => {

@@ -1,7 +1,8 @@
 import React from "react";
 import { Grid, Fade, Grow } from "@material-ui/core";
-// import { useAuth } from "../UserAuth/context/AuthContext";
+import { useAuth } from "../UserAuth/context/AuthContext";
 import styled from "styled-components";
+import axios from "axios";
 
 import SettingsMenu from "./SettingsMenu";
 import ScheduleCards from "./ScheduleCards";
@@ -19,7 +20,17 @@ const BackgroundContainer = styled.div`
 `;
 
 const Dashboard = () => {
-	// const { currentUser } = useAuth();
+	const { currentUser } = useAuth();
+
+	const resetCurrentSchedule = async () => {
+		await axios.post("/resetCurrentSchedulePersistence", {
+			currentUser: currentUser.email,
+		});
+	};
+
+	React.useEffect(() => {
+		resetCurrentSchedule();
+	}, []);
 
 	return (
 		<BackgroundContainer>

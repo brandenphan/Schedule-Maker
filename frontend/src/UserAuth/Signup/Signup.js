@@ -1,5 +1,5 @@
 import React from "react";
-import { Typography, Grid, Avatar } from "@material-ui/core";
+import { Typography, Grid, Avatar, Grow } from "@material-ui/core";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import { useHistory } from "react-router-dom";
@@ -39,48 +39,50 @@ const Signup = () => {
 	return (
 		<>
 			<BackgroundContainer>
-				<Grid container>
-					<Grid item xs={12}>
-						<Grid container justify="center">
-							<FormContainer>
-								<br />
-								<br />
-								<CenteredDiv>
-									<Avatar>
-										<AccountCircleIcon fontSize="large" htmlColor="#8a7aff" />
-									</Avatar>
-								</CenteredDiv>
+				<Grow in={true} timeout={800}>
+					<Grid container>
+						<Grid item xs={12}>
+							<Grid container justify="center">
+								<FormContainer>
+									<br />
+									<br />
+									<CenteredDiv>
+										<Avatar>
+											<AccountCircleIcon fontSize="large" htmlColor="#8a7aff" />
+										</Avatar>
+									</CenteredDiv>
 
-								<br />
-								<Typography
-									align="center"
-									variant="h4"
-									style={{ fontFamily: "Source Sans Pro" }}
-								>
-									<b>Sign Up</b>
-								</Typography>
+									<br />
+									<Typography
+										align="center"
+										variant="h4"
+										style={{ fontFamily: "Source Sans Pro" }}
+									>
+										<b>Sign Up</b>
+									</Typography>
 
-								{error && (
-									<>
-										<br />
-										<br />
-										<Alert severity="error">
-											<AlertTitle>Error</AlertTitle>
-											{error}
-										</Alert>
-									</>
-								)}
+									{error && (
+										<>
+											<br />
+											<br />
+											<Alert severity="error">
+												<AlertTitle>Error</AlertTitle>
+												{error}
+											</Alert>
+										</>
+									)}
 
-								<SignupForm
-									loading={loading}
-									emailRef={emailRef}
-									passwordRef={passwordRef}
-									handleSubmit={handleSubmit}
-								/>
-							</FormContainer>
+									<SignupForm
+										loading={loading}
+										emailRef={emailRef}
+										passwordRef={passwordRef}
+										handleSubmit={handleSubmit}
+									/>
+								</FormContainer>
+							</Grid>
 						</Grid>
 					</Grid>
-				</Grid>
+				</Grow>
 			</BackgroundContainer>
 		</>
 	);

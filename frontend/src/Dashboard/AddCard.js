@@ -15,22 +15,32 @@ import AddIcon from "@material-ui/icons/Add";
 import CloseIcon from "@material-ui/icons/Close";
 import moment from "moment";
 import axios from "axios";
+import { useHistory } from "react-router-dom";
 import { useAuth } from "../UserAuth/context/AuthContext";
 
-// axios.post("/addNewSchedule", { currentUser: currentUser.email });
-// 0.25 means 1/4 0.5 means 2/4 0.75 means 3/4
-
 const AddCard = () => {
+	const history = useHistory();
 	const scheduleNameRef = React.useRef();
 	const [open, setOpen] = React.useState(false);
 	const [error, setError] = React.useState("");
 	const currentDate = moment().format("LLLL");
 	const { currentUser } = useAuth();
 
-	const handleSubmit = (event) => {
+	const handleSchedulePersistence = async (scheduleName) => {
+		await axios
+			.post("/setCurrentSchedulePersistence", {
+				currentUser: currentUser.email,
+				scheduleName: scheduleName,
+			})
+			.then(() => {
+				history.push("/SchedulePage");
+			});
+	};
+
+	const handleSubmit = async (event) => {
 		event.preventDefault();
 
-		axios
+		await axios
 			.post("/addNewSchedule", {
 				scheduleName: scheduleNameRef.current.value,
 				currentDate: currentDate,
@@ -42,6 +52,8 @@ const AddCard = () => {
 			.catch((error) => {
 				setError(error.response.statusText);
 			});
+
+		handleSchedulePersistence(scheduleNameRef.current.value);
 	};
 
 	return (
@@ -68,8 +80,8 @@ const AddCard = () => {
 			>
 				<DialogTitle>
 					<Grid container>
-						<Grid item xs={6} style={{ marginTop: "2%" }}>
-							Create Schedule
+						<Grid item xs={6} style={{ marginTop: "3%" }}>
+							Add Schedule
 						</Grid>
 						<Grid item xs={6}>
 							<Grid container justify="flex-end">

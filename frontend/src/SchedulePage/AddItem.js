@@ -31,7 +31,7 @@ const StyledSwitch = withStyles({
 	track: {},
 })(Switch);
 
-const AddItem = () => {
+const AddItem = ({ currentSchedule, getScheduleData }) => {
 	const { currentUser } = useAuth();
 	const itemNameRef = React.useRef();
 	const [open, setOpen] = React.useState(false);
@@ -68,7 +68,7 @@ const AddItem = () => {
 			let startTimeString = startTime.replace(":", "");
 			let startTimeHour = parseInt(startTimeString.substring(0, 2));
 			let startTimeMinute = parseInt(startTimeString.substring(2, 4));
-			let endTimeString = startTime.replace(":", "");
+			let endTimeString = endTime.replace(":", "");
 			let endTimeHour = parseInt(endTimeString.substring(0, 2));
 			let endTimeMinute = parseInt(endTimeString.substring(2, 4));
 
@@ -173,13 +173,13 @@ const AddItem = () => {
 						endTimeHourKey: endTimeHour,
 						endTimeMinuteKey: endTimeMinute,
 					},
-					rRule: "FREQ-WEEKLY;COUNT=1000",
+					rRule: "FREQ=WEEKLY;COUNT=1000",
 				};
 				ScheduleItemsArray.push(fridayItem);
 			}
 			axios
 				.post("/addScheduleEvent", {
-					scheduleName: "ScheduleName",
+					scheduleName: currentSchedule,
 					itemName: itemNameRef.current.value,
 					information: ScheduleItemsArray,
 					currentUser: currentUser.email,
@@ -187,6 +187,7 @@ const AddItem = () => {
 				})
 				.then(() => {
 					setOpen(false);
+					getScheduleData();
 				})
 				.catch((error) => {
 					setError(error.response.statusText);
