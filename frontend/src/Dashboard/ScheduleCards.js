@@ -8,8 +8,10 @@ import {
 	CardActions,
 	Typography,
 	IconButton,
+	CircularProgress,
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
+import ErrorIcon from "@material-ui/icons/Error";
 import { useHistory } from "react-router-dom";
 import AddCard from "./AddCard";
 import { useAuth } from "../UserAuth/context/AuthContext";
@@ -48,148 +50,154 @@ const ScheduleCards = () => {
 		userSchedulesReducer,
 		{ data: [], isLoading: true, isError: false }
 	);
-	const [error, setError] = React.useState("");
+	const [paddedGrids, setPaddedGrids] = React.useState();
 
-	let numberSchedules = 0;
-	let remainingGrids = 0;
-	let paddedGrids = 0;
-
-	const handleClick = (string) => {
-		console.log(string);
+	const handleClick = (scheduleName) => {
+		console.log(scheduleName);
 	};
 
 	const getUserSchedules = async () => {
 		dispatchUserScheduleData({ type: "DATA_LOADING" });
 		try {
 			await axios
-				.get("/getUserSchedule", { params: { currentUser: currentUser.email } })
+				.get("/getUserSchedules", {
+					params: { currentUser: currentUser.email },
+				})
 				.then((data) => {
 					dispatchUserScheduleData({
 						type: "DATA_LOADING_SUCCESS",
 						payload: data.data,
 					});
 
-					numberSchedules = data.data.length + 1;
-					remainingGrids = numberSchedules % 4;
+					let numberSchedules = data.data.length + 1;
+					let remainingGrids = numberSchedules % 4;
 					if (remainingGrids === 1) {
-						paddedGrids = 3;
+						setPaddedGrids(3);
 					} else if (remainingGrids === 2) {
-						paddedGrids = 2;
+						setPaddedGrids(2);
 					} else if (remainingGrids === 3) {
-						paddedGrids = 1;
+						setPaddedGrids(1);
 					}
 				})
-				.catch((error) => {
-					setError(error.response.statusText);
+				.catch(() => {
+					dispatchUserScheduleData({ type: "DATA_LOADING_FAILURE" });
 				});
 		} catch {
 			dispatchUserScheduleData({ type: "DATA_LOADING_FAILURE" });
 		}
 	};
-
 	React.useEffect(() => {
 		getUserSchedules();
 	}, []);
 
+	let paddedGridsArray = [];
+	for (let i = 0; i < paddedGrids; i++) {
+		paddedGridsArray.push(<Grid item xs={3} />);
+	}
+
 	return (
-		// finish this tmo
 		<>
-			{userScheduleData.data.map((value) => {
-				console.log(value);
-				return (
-					<div key={value._id}>
-						<p>{value.scheduleName}</p>
-					</div>
-				);
-			})}
-			{/* {userScheduleData.data.forEach(() => {
-				return (
-					<Grid>
-						<p>HEY</p>
+			{userScheduleData.isLoading ? (
+				<Grid container>
+					<Grid item xs={12}>
+						<Grid container justify="center">
+							<CircularProgress />
+						</Grid>
 					</Grid>
-				);
-			})} */}
-			{/* <Zoom in={true} timeout={800}>
-				<Grid item xs={3} style={{ borderRadius: "20px" }}>
-					<div
-						style={{
-							padding: "5%",
-						}}
-					>
-						<Card>
-							<CardActionArea
-								onClick={() => {
-									handleClick("Name"); // This will be dynamic based on the card on click set the context equal to this figure context out after
-									history.push("/SchedulePage");
-								}}
-							>
-								<CardContent>
-									<Typography>Schedule Name</Typography>
-									<Typography>Last Modified</Typography>
-								</CardContent>
-							</CardActionArea>
-							<CardActions style={{ float: "right", marginTop: "-3%" }}>
-								<IconButton>
-									<DeleteIcon />
-								</IconButton>
-							</CardActions>
-						</Card>
-					</div>
 				</Grid>
-			</Zoom>
-			<Zoom in={true} timeout={800}>
-				<Grid item xs={3} style={{ borderRadius: "20px" }}>
-					<div
-						style={{
-							padding: "5%",
-						}}
-					>
-						<Card>
-							<CardActionArea
-								onClick={() => {
-									history.push("/SchedulePage");
+			) : userScheduleData.isError ? (
+				<Grid container>
+					<Grid item xs={12}>
+						<Grid container justify="center">
+							<ErrorIcon
+								style={{
+									height: "4%",
+									width: "4%",
+									color: "red",
+									marginTop: "1%",
 								}}
+							/>
+						</Grid>
+					</Grid>
+					<Grid item xs={12}>
+						<Grid container justify="center">
+							<Typography
+								variant="h4"
+								style={{ marginTop: "1%", marginBottom: "1%", color: "red" }}
 							>
-								<CardContent>
-									<Typography>Schedule Name</Typography>
-									<Typography>Last Modified</Typography>
-								</CardContent>
-							</CardActionArea>
-							<CardActions style={{ float: "right", marginTop: "-3%" }}>
-								<IconButton>
-									<DeleteIcon />
-								</IconButton>
-							</CardActions>
-						</Card>
-					</div>
+								Error connecting to database, please try again later{" "}
+							</Typography>
+						</Grid>
+					</Grid>
 				</Grid>
-			</Zoom>
-			<Zoom in={true} timeout={800}>
-				<Grid
-					item
-					xs={3}
-					style={{
-						borderRadius: "20px",
-					}}
-				>
-					<div
-						style={{
-							padding: "5%",
-						}}
-					>
-						<Card
+			) : (
+				<>
+					{userScheduleData.data.map((value) => {
+						return (
+							<Zoom in={true} timeout={800} key={value.scheduleName}>
+								<Grid item xs={3} style={{ borderRadius: "20px" }}>
+									<div
+										style={{
+											padding: "5%",
+										}}
+									>
+										<Card>
+											<CardActionArea
+												onClick={() => {
+													handleClick(value.scheduleName);
+													history.push("/SchedulePage");
+												}}
+											>
+												<CardContent>
+													<Typography variant="h6">
+														{value.scheduleName}
+													</Typography>
+													<Typography style={{ marginTop: "2%" }}>
+														Date Modified: {value.currentDate}
+													</Typography>
+												</CardContent>
+											</CardActionArea>
+											<CardActions style={{ float: "right", marginTop: "-3%" }}>
+												<IconButton>
+													<DeleteIcon />
+												</IconButton>
+											</CardActions>
+										</Card>
+									</div>
+								</Grid>
+							</Zoom>
+						);
+					})}
+					<Zoom in={true} timeout={800}>
+						<Grid
+							item
+							xs={3}
 							style={{
-								width: "100%",
-								textAlign: "center",
-								marginTop: "7%",
+								borderRadius: "20px",
 							}}
 						>
-							<AddCard />
-						</Card>
-					</div>
-				</Grid>
-			</Zoom> */}
-			<Grid item xs={3}></Grid>
+							<div
+								style={{
+									padding: "5%",
+								}}
+							>
+								<Card
+									style={{
+										width: "100%",
+										textAlign: "center",
+										marginTop: "9%",
+									}}
+								>
+									<AddCard />
+								</Card>
+							</div>
+						</Grid>
+					</Zoom>
+					{paddedGridsArray.map((value) => {
+						return value;
+					})}
+				</>
+			)}
 		</>
 	);
 };

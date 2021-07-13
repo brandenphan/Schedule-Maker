@@ -34,7 +34,7 @@ const scheduleSchema = mongoose.Schema({
 	scheduleEvents: Array,
 });
 
-app.get("/getUserSchedule", async (req, res) => {
+app.get("/getUserSchedules", async (req, res) => {
 	if (successfulDatabaseConnection === false) {
 		res.statusMessage = "Failed to connect to database, please try again later";
 		res.status(503).end();
@@ -49,6 +49,16 @@ app.get("/getUserSchedule", async (req, res) => {
 			});
 	}
 });
+
+// Make sure the a user information is stored within the database upon login and signup first
+// app.get("getCurrentUserSchedule", async (req, res) => {
+// 	if (successfulDatabaseConnection === false) {
+// 		res.statusMessage = "Failed to connect to database, please try again later";
+// 		res.status(503).end();
+// 	} else {
+// 		const currentUser = req.query.currentUser;
+// 	}
+// });
 
 app.post("/addNewSchedule", async (req, res) => {
 	if (successfulDatabaseConnection === false) {
