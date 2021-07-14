@@ -115,4 +115,39 @@ router.post("/addScheduleEvent", async (req, res) => {
 	}
 });
 
+router.post("/changeScheduleSettings", async (req, res) => {
+	if (successfulDatabaseConnection === false) {
+		res.statusMessage = "Failed to connect to database, please try again later";
+		res.status(503).end();
+	} else {
+		const currentUser = req.body.currentUser;
+		const currentSchedule = req.body.currentSchedule;
+		let showAllHours = req.body.showAllHours;
+
+		const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser);
+
+		const foundSchedule = await Schedule.find({
+			scheduleName: currentSchedule,
+		});
+		await Schedule.deleteMany({ scheduleName: currentSchedule });
+
+		if (showAllHours === false) {
+			showAllHours = true;
+		} else {
+			showAllHours = false;
+		}
+
+		const updatedSchedule = new Schedule({
+			scheduleName: foundSchedule[0].scheduleName,
+			currentDate: foundSchedule[0].currentDate,
+			type: "TimeTable",
+			scheduleEvents: foundSchedule[0].scheduleEvents,
+			showAllHours: showAllHours,
+		});
+		updatedSchedule.save();
+
+		res.send("Successfully changed schedule setting");
+	}
+});
+
 export default router;

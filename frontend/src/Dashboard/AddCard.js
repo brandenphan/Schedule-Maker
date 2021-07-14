@@ -80,7 +80,7 @@ const AddCard = () => {
 			>
 				<DialogTitle>
 					<Grid container>
-						<Grid item xs={6} style={{ marginTop: "3%" }}>
+						<Grid item xs={6} style={{ marginTop: "3%", width: "300px" }}>
 							Add Schedule
 						</Grid>
 						<Grid item xs={6}>

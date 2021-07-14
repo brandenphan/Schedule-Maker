@@ -5,8 +5,15 @@ import {
 	Button,
 	Typography,
 	CircularProgress,
+	Dialog,
+	DialogTitle,
+	DialogContent,
+	IconButton,
+	withStyles,
+	Switch,
 } from "@material-ui/core";
 import ErrorIcon from "@material-ui/icons/Error";
+import CloseIcon from "@material-ui/icons/Close";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import SettingsMenu from "../Dashboard/SettingsMenu";
@@ -15,6 +22,20 @@ import AddItem from "./AddItem";
 import axios from "axios";
 import moment from "moment";
 import { useAuth } from "../UserAuth/context/AuthContext";
+
+const StyledSwitch = withStyles({
+	switchBase: {
+		color: "#dfe7fb",
+		"&$checked": {
+			color: "#6a8fec",
+		},
+		"&$checked + $track": {
+			backgroundColor: "#6a8fec",
+		},
+	},
+	checked: {},
+	track: {},
+})(Switch);
 
 const BackgroundContainer = styled.div`
 	background: linear-gradient(to left, #e6e6f0, #e9edf7);
@@ -81,6 +102,7 @@ const getAppointmentsReducer = (state, action) => {
 };
 
 const SchedulePage = () => {
+	const [open, setOpen] = React.useState(false);
 	const history = useHistory();
 	const { currentUser } = useAuth();
 	const [currentSchedule, dispatchCurrentSchedule] = React.useReducer(
@@ -185,6 +207,24 @@ const SchedulePage = () => {
 		}
 	};
 
+	const changeScheduleSettings = async () => {
+		let currentScheduleForData;
+
+		await axios
+			.get("/getUserPersistence", {
+				params: { currentUser: currentUser.email },
+			})
+			.then((data) => {
+				currentScheduleForData = data.data;
+			});
+
+		await axios.post("/changeScheduleSettings", {
+			currentUser: currentUser.email,
+			currentSchedule: currentScheduleForData,
+			showAllHours: hoursShown,
+		});
+	};
+
 	React.useEffect(() => {
 		getScheduleData();
 		// eslint-disable-next-line
@@ -223,7 +263,12 @@ const SchedulePage = () => {
 								getScheduleData={getScheduleData}
 							/>
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-							<Button style={{ color: "#6a8fec", marginTop: "0.5%" }}>
+							<Button
+								onClick={() => {
+									setOpen(true);
+								}}
+								style={{ color: "#6a8fec", marginTop: "0.5%" }}
+							>
 								Schedule Settings
 							</Button>
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -282,6 +327,55 @@ const SchedulePage = () => {
 					&nbsp;
 				</Grid>
 			</Grid>
+
+			<Dialog
+				onClose={() => {
+					setOpen(false);
+				}}
+				open={open}
+				PaperProps={{
+					style: { borderRadius: 20, backgroundColor: "#ebf0fa" },
+				}}
+			>
+				<DialogTitle>
+					<Grid container>
+						<Grid item xs={6} style={{ marginTop: "2%", width: "300px" }}>
+							Schedule Settings
+						</Grid>
+						<Grid item xs={6}>
+							<Grid container justify="flex-end">
+								<IconButton
+									onClick={() => {
+										setOpen(false);
+									}}
+								>
+									<CloseIcon />
+								</IconButton>
+							</Grid>
+						</Grid>
+					</Grid>
+				</DialogTitle>
+				<DialogContent dividers>
+					<Grid container>
+						<Grid item xs={6}>
+							<Grid container justify="flex-start">
+								<Typography>Show All Hours</Typography>
+							</Grid>
+						</Grid>
+						<Grid item xs={6}>
+							<Grid container justify="flex-end">
+								<StyledSwitch
+									checked={hoursShown}
+									onChange={(event) => {
+										setHoursShown(event.target.checked);
+										changeScheduleSettings();
+									}}
+								/>
+							</Grid>
+						</Grid>
+					</Grid>
+				</DialogContent>
+			</Dialog>
 		</BackgroundContainer>
 	);
 };
