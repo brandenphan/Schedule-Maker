@@ -137,7 +137,6 @@ const SchedulePage = () => {
 	const dateObject = new Date(2021, 2, 1, 1);
 	const beginningDate = moment(dateObject);
 	let date = beginningDate.date;
-	const currentDate = moment();
 	const [hoursShown, setHoursShown] = React.useState(false);
 
 	const makeTodayAppointment = (startDate, endDate) => {

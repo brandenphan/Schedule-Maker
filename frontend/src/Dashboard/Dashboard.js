@@ -30,6 +30,7 @@ const Dashboard = () => {
 
 	React.useEffect(() => {
 		resetCurrentSchedule();
+		// eslint-disable-next-line
 	}, []);
 
 	return (

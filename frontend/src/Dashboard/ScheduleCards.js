@@ -90,8 +90,8 @@ const ScheduleCards = () => {
 	};
 
 	React.useEffect(() => {
-		// eslint-disable-next-line
 		getUserSchedules();
+		// eslint-disable-next-line
 	}, []);
 
 	const handleScheduleClick = async (scheduleName) => {
@@ -108,7 +108,7 @@ const ScheduleCards = () => {
 	const [paddedGrids, setPaddedGrids] = React.useState();
 	let paddedGridsArray = [];
 	for (let i = 0; i < paddedGrids; i++) {
-		paddedGridsArray.push(<Grid item xs={3} />);
+		paddedGridsArray.push(<Grid item xs={3} key={i} />);
 	}
 
 	const [open, setOpen] = React.useState(false);
@@ -169,20 +169,27 @@ const ScheduleCards = () => {
 				<>
 					{userScheduleData.data.map((value) => (
 						<Zoom in={true} timeout={800} key={value.scheduleName}>
-							<Grid item xs={3} style={{ borderRadius: "20px" }}>
+							<Grid
+								item
+								xs={3}
+								style={{ borderRadius: "20px" }}
+								key={value.scheduleName}
+							>
 								<div
 									style={{
 										padding: "5%",
 									}}
+									key={value.scheduleName}
 								>
-									<Card>
+									<Card key={value.scheduleName}>
 										<CardActionArea
+											key={value.scheduleName}
 											onClick={() => {
 												handleScheduleClick(value.scheduleName);
 											}}
 										>
-											<CardContent>
-												<Typography variant="h6">
+											<CardContent key={value.scheduleName}>
+												<Typography variant="h6" key={value.scheduleName}>
 													{value.scheduleName}
 												</Typography>
 												<Typography style={{ marginTop: "2%" }}>
@@ -223,7 +230,6 @@ const ScheduleCards = () => {
 										width: "100%",
 										height: "100%",
 										textAlign: "center",
-										// marginTop: "9%",
 									}}
 								>
 									<AddCard />

@@ -7,9 +7,10 @@ import LoggedInRoute from "./UserAuth/Routes/LoggedInRoute";
 
 import Login from "./UserAuth/Login/Login";
 import Signup from "./UserAuth/Signup/Signup";
+import ForgotPassword from "./UserAuth/ForgotPassword/ForgotPassword";
+import ChangePassword from "./UserAuth/ChangePassword/ChangePassword";
 import LandingPage from "./LandingPage";
 import DashboardPage from "./Dashboard/Dashboard";
-import ForgotPassword from "./UserAuth/ForgotPassword/ForgotPassword";
 import SchedulePage from "./SchedulePage/SchedulePage";
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
 					<LoggedInRoute path="/Login" component={Login} />
 					<Route path="/ForgotPassword" component={ForgotPassword} />
 
+					<PrivateRoute path="/ChangePassword" component={ChangePassword} />
 					<PrivateRoute path="/Dashboard" component={DashboardPage} />
 					<PrivateRoute path="/SchedulePage" component={SchedulePage} />
 				</AuthProvider>
