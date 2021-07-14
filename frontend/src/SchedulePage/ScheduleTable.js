@@ -6,7 +6,7 @@ import {
 	Grid,
 	Typography,
 } from "@material-ui/core";
-import { ViewState } from "@devexpress/dx-react-scheduler";
+import { EditingState, ViewState } from "@devexpress/dx-react-scheduler";
 import {
 	Scheduler,
 	WeekView,

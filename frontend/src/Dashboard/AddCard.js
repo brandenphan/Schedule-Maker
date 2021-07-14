@@ -48,13 +48,11 @@ const AddCard = () => {
 				currentUser: currentUser.email,
 			})
 			.then(() => {
-				setOpen(false);
+				handleSchedulePersistence(scheduleNameRef.current.value);
 			})
 			.catch((error) => {
 				setError(error.response.statusText);
 			});
-
-		handleSchedulePersistence(scheduleNameRef.current.value);
 	};
 
 	return (

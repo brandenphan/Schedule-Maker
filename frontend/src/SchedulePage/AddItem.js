@@ -190,6 +190,7 @@ const AddItem = ({ currentSchedule, getScheduleData }) => {
 					getScheduleData();
 				})
 				.catch((error) => {
+					console.log("HEY");
 					setError(error.response.statusText);
 				});
 		}
