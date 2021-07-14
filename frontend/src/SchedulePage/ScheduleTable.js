@@ -6,7 +6,7 @@ import {
 	Grid,
 	Typography,
 } from "@material-ui/core";
-import { EditingState, ViewState } from "@devexpress/dx-react-scheduler";
+import { ViewState } from "@devexpress/dx-react-scheduler";
 import {
 	Scheduler,
 	WeekView,
@@ -14,6 +14,7 @@ import {
 	Toolbar,
 	DateNavigator,
 	TodayButton,
+	AppointmentTooltip,
 } from "@devexpress/dx-react-scheduler-material-ui";
 import ErrorIcon from "@material-ui/icons/Error";
 import moment from "moment";
@@ -76,6 +77,7 @@ const ScheduleTable = ({ appointments, showAllHours }) => {
 							<DateNavigator />
 							<TodayButton />
 							<Appointments />
+							<AppointmentTooltip />
 						</Scheduler>
 					</Paper>
 				</Fade>

@@ -11,6 +11,7 @@ import {
 	IconButton,
 	withStyles,
 	Switch,
+	TextField,
 } from "@material-ui/core";
 import ErrorIcon from "@material-ui/icons/Error";
 import CloseIcon from "@material-ui/icons/Close";
@@ -247,13 +248,21 @@ const SchedulePage = () => {
 						</Grid>
 					</Fade>
 				</Grid>
-				<Grid item xs={10}>
+				<Grid item xs={1} />
+				<Grid item xs={4} style={{ marginTop: "1.7%" }}>
+					<TextField
+						variant="standard"
+						value="Schedule Name"
+						style={{ width: "100%" }}
+					/>
+				</Grid>
+				<Grid item xs={5}>
 					<Fade in={true} timeout={1000}>
 						<Grid
 							container
 							justify="flex-end"
 							style={{
-								marginTop: "1%",
+								marginTop: "2%",
 								marginLeft: "-2%",
 							}}
 						>
@@ -261,6 +270,15 @@ const SchedulePage = () => {
 								currentSchedule={currentSchedule.data}
 								getScheduleData={getScheduleData}
 							/>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<Button
+								onClick={() => {
+									console.log("DELETING");
+								}}
+								style={{ color: "#6a8fec", marginTop: "0.5%" }}
+							>
+								Delete Item
+							</Button>
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 							<Button
 								onClick={() => {
