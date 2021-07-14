@@ -39,7 +39,10 @@ router.get("/getScheduleInformation", async (req, res) => {
 					};
 					scheduleInformation.push(eachItemValues);
 				});
-				res.send(scheduleInformation);
+				res.send({
+					scheduleInformation: scheduleInformation,
+					showAllHours: data[0].showAllHours,
+				});
 			});
 	}
 });
@@ -74,6 +77,7 @@ router.post("/addScheduleEvent", async (req, res) => {
 			res.status(400).end();
 		} else {
 			let updatedEvents = [];
+			let showAllHours;
 			await Schedule.find({ scheduleName: scheduleName })
 				.exec()
 				.then((data) => {
@@ -84,6 +88,8 @@ router.post("/addScheduleEvent", async (req, res) => {
 					data[0].scheduleEvents.forEach((itemData) => {
 						updatedEvents.push(itemData);
 					});
+
+					showAllHours = data[0].showAllHours;
 				});
 
 			await Schedule.deleteOne({ scheduleName: scheduleName })
@@ -97,6 +103,7 @@ router.post("/addScheduleEvent", async (req, res) => {
 				currentDate: currentDate,
 				type: "TimeTable",
 				scheduleEvents: updatedEvents,
+				showAllHours: showAllHours,
 			});
 
 			schedule.save().then(() => {

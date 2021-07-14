@@ -5,6 +5,7 @@ const scheduleSchema = mongoose.Schema({
 	currentDate: String,
 	type: String,
 	scheduleEvents: Array,
+	showAllHours: Boolean,
 });
 
 export default scheduleSchema;

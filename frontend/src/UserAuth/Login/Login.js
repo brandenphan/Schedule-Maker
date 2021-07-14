@@ -5,7 +5,6 @@ import { Alert, AlertTitle } from "@material-ui/lab";
 import { useHistory } from "react-router-dom";
 import firebase from "firebase/app";
 import "@fontsource/source-sans-pro";
-import axios from "axios";
 
 import { useAuth } from "../context/AuthContext";
 import {
@@ -38,13 +37,9 @@ const Login = () => {
 		}
 
 		try {
-			// let emailValue = emailRef.current.value;
 			setError("");
 			await login(emailRef.current.value, passwordRef.current.value);
 			setLoading(true);
-
-			// await axios.post("/setUserSettings", {})
-
 			history.push("/Dashboard");
 		} catch (error) {
 			setError(error.message);

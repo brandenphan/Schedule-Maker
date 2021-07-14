@@ -70,6 +70,7 @@ router.post("/addNewSchedule", async (req, res) => {
 				currentDate: currentDate,
 				type: "TimeTable",
 				scheduleEvents: [],
+				showAllHours: false,
 			});
 			schedule.save().then(() => {
 				console.log("New schedule saved");

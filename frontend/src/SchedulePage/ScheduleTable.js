@@ -18,7 +18,7 @@ import {
 import ErrorIcon from "@material-ui/icons/Error";
 import moment from "moment";
 
-const ScheduleTable = ({ appointments }) => {
+const ScheduleTable = ({ appointments, showAllHours }) => {
 	const currentDate = moment();
 
 	return (
@@ -59,11 +59,19 @@ const ScheduleTable = ({ appointments }) => {
 					<Paper>
 						<Scheduler data={appointments.data}>
 							<ViewState defaultCurrentDate={currentDate} />
-							<WeekView
-								startDayHour={8}
-								endDayHour={19}
-								excludedDays={[0, 6]}
-							/>
+							{showAllHours ? (
+								<WeekView
+									startDayHour={0}
+									endDayHour={24}
+									excludedDays={[0, 6]}
+								/>
+							) : (
+								<WeekView
+									startDayHour={8}
+									endDayHour={19}
+									excludedDays={[0, 6]}
+								/>
+							)}
 							<Toolbar />
 							<DateNavigator />
 							<TodayButton />

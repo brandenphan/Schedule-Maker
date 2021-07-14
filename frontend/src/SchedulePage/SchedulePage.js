@@ -3,11 +3,6 @@ import {
 	Grid,
 	Fade,
 	Button,
-	Dialog,
-	DialogTitle,
-	DialogContent,
-	DialogActions,
-	IconButton,
 	Typography,
 	CircularProgress,
 } from "@material-ui/core";
@@ -121,6 +116,7 @@ const SchedulePage = () => {
 	const beginningDate = moment(dateObject);
 	let date = beginningDate.date;
 	const currentDate = moment();
+	const [hoursShown, setHoursShown] = React.useState(false);
 
 	const makeTodayAppointment = (startDate, endDate) => {
 		const days = moment(startDate).diff(endDate, "days");
@@ -165,7 +161,7 @@ const SchedulePage = () => {
 					},
 				})
 				.then((data) => {
-					const appointmentsData = data.data.map(
+					const appointmentsData = data.data.scheduleInformation.map(
 						({ startDate, endDate, ...restArgs }) => {
 							const result = {
 								...makeTodayAppointment(startDate, endDate),
@@ -176,6 +172,8 @@ const SchedulePage = () => {
 							return result;
 						}
 					);
+
+					setHoursShown(data.data.showAllHours);
 
 					dispatchAppointments({
 						type: "DATA_LOADING_SUCCESS",
@@ -276,7 +274,10 @@ const SchedulePage = () => {
 							</Grid>
 						</Grid>
 					) : (
-						<ScheduleTable appointments={appointments} />
+						<ScheduleTable
+							appointments={appointments}
+							showAllHours={hoursShown}
+						/>
 					)}
 					&nbsp;
 				</Grid>
