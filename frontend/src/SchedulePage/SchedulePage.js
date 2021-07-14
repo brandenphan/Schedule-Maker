@@ -249,12 +249,28 @@ const SchedulePage = () => {
 					</Fade>
 				</Grid>
 				<Grid item xs={1} />
-				<Grid item xs={4} style={{ marginTop: "1.7%" }}>
-					<TextField
-						variant="standard"
-						value="Schedule Name"
-						style={{ width: "100%" }}
-					/>
+				<Grid item xs={3} style={{ marginTop: "0.9%" }}>
+					<Fade in={true} timeout={1000}>
+						<TextField
+							variant="standard"
+							label={currentSchedule.data}
+							style={{ width: "90%" }}
+						/>
+					</Fade>
+				</Grid>
+				<Grid item xs={1} style={{ marginTop: "1.5%" }}>
+					<Fade in={true} timeout={1000}>
+						<Button
+							variant="contained"
+							style={{
+								backgroundColor: "#7899ed",
+								color: "white",
+								marginTop: "1%",
+							}}
+						>
+							Save
+						</Button>
+					</Fade>
 				</Grid>
 				<Grid item xs={5}>
 					<Fade in={true} timeout={1000}>
@@ -262,7 +278,7 @@ const SchedulePage = () => {
 							container
 							justify="flex-end"
 							style={{
-								marginTop: "2%",
+								marginTop: "2.3%",
 								marginLeft: "-2%",
 							}}
 						>
