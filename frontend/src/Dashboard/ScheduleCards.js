@@ -221,8 +221,9 @@ const ScheduleCards = () => {
 								<Card
 									style={{
 										width: "100%",
+										height: "100%",
 										textAlign: "center",
-										marginTop: "9%",
+										// marginTop: "9%",
 									}}
 								>
 									<AddCard />

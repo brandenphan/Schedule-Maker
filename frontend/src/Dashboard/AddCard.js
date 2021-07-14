@@ -9,6 +9,7 @@ import {
 	Grid,
 	TextField,
 	Button,
+	Typography,
 } from "@material-ui/core";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import AddIcon from "@material-ui/icons/Add";
@@ -65,7 +66,11 @@ const AddCard = () => {
 				}}
 			>
 				<CardContent>
+					<Typography variant="subtitle2">&nbsp;</Typography>
+					<Typography variant="subtitle2">&nbsp;</Typography>
 					<AddIcon />
+					<Typography>&nbsp;</Typography>
+					<Typography variant="subtitle2">&nbsp;</Typography>
 				</CardContent>
 			</CardActionArea>
 
