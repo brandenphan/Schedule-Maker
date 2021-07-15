@@ -36,6 +36,53 @@ router.delete("/deleteUserSchedule", async (req, res) => {
 	}
 });
 
+router.post("/renameUserSchedule", async (req, res) => {
+	if (successfulDatabaseConnection === false) {
+		res.statusMessage = "Failed to connect to database, please try again later";
+		res.status(503).end();
+	} else {
+		const currentUser = req.body.currentUser;
+		const scheduleName = req.body.scheduleName;
+		const newScheduleName = req.body.newScheduleName;
+		const currentDate = req.body.currentDate;
+
+		const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser);
+		let duplicateName = false;
+
+		await Schedule.find({ type: "TimeTable" })
+			.exec()
+			.then((data) => {
+				data.forEach((specificSchedule) => {
+					if (
+						newScheduleName.toLowerCase() ===
+						specificSchedule.scheduleName.toLowerCase()
+					) {
+						duplicateName = true;
+					}
+				});
+			});
+
+		if (duplicateName === true) {
+			res.statusMessage = "There is already another schedule with this name";
+			res.status(400).end();
+		} else {
+			const foundSchedule = await Schedule.find({ scheduleName: scheduleName });
+			await Schedule.deleteMany({ scheduleName: scheduleName });
+
+			const updatedSchedule = new Schedule({
+				scheduleName: newScheduleName,
+				currentDate: currentDate,
+				type: "TimeTable",
+				scheduleEvents: foundSchedule[0].scheduleEvents,
+				showAllHours: foundSchedule[0].showAllHours,
+			});
+			updatedSchedule.save();
+
+			res.send("Successfully renamed schedule");
+		}
+	}
+});
+
 router.post("/addNewSchedule", async (req, res) => {
 	if (successfulDatabaseConnection === false) {
 		res.statusMessage = "Failed to connect to database, please try again later";

@@ -137,16 +137,17 @@ const SettingsMenu = () => {
 											onClick={() => {
 												history.push("/ChangePassword");
 											}}
-											fullWidth
+											// fullWidth
 											variant="contained"
 											style={{
 												backgroundColor: "#6a8fec",
 												color: "white",
 												borderRadius: "10px",
 												padding: "2%",
+												width: "80%",
 											}}
 										>
-											Change Password
+											Change
 										</Button>
 									</Grid>
 								</Grid>

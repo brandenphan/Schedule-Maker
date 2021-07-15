@@ -110,6 +110,7 @@ const SchedulePage = () => {
 		getPersistenceReducer,
 		{ data: [], isLoading: true, isError: false }
 	);
+	const currentDate = moment().format("LLLL");
 
 	const getPersistence = async () => {
 		dispatchCurrentSchedule({ type: "DATA_P_LOADING" });
@@ -222,7 +223,52 @@ const SchedulePage = () => {
 			currentUser: currentUser.email,
 			currentSchedule: currentScheduleForData,
 			showAllHours: hoursShown,
+			currentDate: currentDate,
 		});
+	};
+
+	const newScheduleName = React.useRef();
+
+	const changeScheduleName = async () => {
+		let currentScheduleForData;
+
+		await axios
+			.get("/getUserPersistence", {
+				params: { currentUser: currentUser.email },
+			})
+			.then((data) => {
+				currentScheduleForData = data.data;
+			});
+
+		await axios
+			.post("/renameSchedule", {
+				currentUser: currentUser.email,
+				currentSchedule: currentScheduleForData,
+				newScheduleName: newScheduleName.current.value,
+				currentDate: currentDate,
+			})
+			.then(async () => {
+				await axios.post("/setCurrentSchedulePersistence", {
+					currentUser: currentUser.email,
+					scheduleName: newScheduleName.current.value,
+				});
+
+				getScheduleData();
+
+				await axios
+					.get("/getUserPersistence", {
+						params: { currentUser: currentUser.email },
+					})
+					.then((data) => {
+						dispatchCurrentSchedule({
+							type: "DATA_P_LOADING_SUCCESS",
+							payload: data.data,
+						});
+					});
+			})
+			.catch((error) => {
+				window.alert(error.response.statusText);
+			});
 	};
 
 	React.useEffect(() => {
@@ -249,12 +295,13 @@ const SchedulePage = () => {
 					</Fade>
 				</Grid>
 				<Grid item xs={1} />
-				<Grid item xs={3} style={{ marginTop: "0.9%" }}>
+				<Grid item xs={3} style={{ marginTop: "1%", marginLeft: "-2%" }}>
 					<Fade in={true} timeout={1000}>
 						<TextField
 							variant="standard"
 							label={currentSchedule.data}
 							style={{ width: "90%" }}
+							inputRef={newScheduleName}
 						/>
 					</Fade>
 				</Grid>
@@ -265,7 +312,10 @@ const SchedulePage = () => {
 							style={{
 								backgroundColor: "#7899ed",
 								color: "white",
-								marginTop: "1%",
+								marginTop: "1.1%",
+							}}
+							onClick={() => {
+								changeScheduleName();
 							}}
 						>
 							Save
@@ -289,11 +339,11 @@ const SchedulePage = () => {
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 							<Button
 								onClick={() => {
-									console.log("DELETING");
+									console.log("EDITING");
 								}}
 								style={{ color: "#6a8fec", marginTop: "0.5%" }}
 							>
-								Delete Item
+								Edit Item
 							</Button>
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 							<Button

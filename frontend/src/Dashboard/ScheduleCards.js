@@ -14,14 +14,17 @@ import {
 	CircularProgress,
 	Button,
 	DialogTitle,
+	TextField,
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
+import EditIcon from "@material-ui/icons/Edit";
 import ErrorIcon from "@material-ui/icons/Error";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import { useHistory } from "react-router-dom";
 import AddCard from "./AddCard";
 import { useAuth } from "../UserAuth/context/AuthContext";
 import axios from "axios";
+import moment from "moment";
 
 const userSchedulesReducer = (state, action) => {
 	switch (action.type) {
@@ -52,6 +55,7 @@ const userSchedulesReducer = (state, action) => {
 const ScheduleCards = () => {
 	const history = useHistory();
 	const { currentUser } = useAuth();
+	const currentDate = moment().format("LLLL");
 
 	const [userScheduleData, dispatchUserScheduleData] = React.useReducer(
 		userSchedulesReducer,
@@ -111,22 +115,45 @@ const ScheduleCards = () => {
 		paddedGridsArray.push(<Grid item xs={3} key={i} />);
 	}
 
-	const [open, setOpen] = React.useState(false);
+	const [openDelete, setOpenDelete] = React.useState(false);
 	const [scheduleToDelete, setScheduleToDelete] = React.useState();
-	const [error, setError] = React.useState("");
+	const [errorDelete, setErrorDelete] = React.useState("");
 
 	const handleScheduleDelete = async (scheduleName) => {
-		setError("");
+		setErrorDelete("");
 		await axios
 			.delete("/deleteUserSchedule", {
 				data: { currentUser: currentUser.email, scheduleName: scheduleName },
 			})
 			.then(() => {
-				setOpen(false);
+				setOpenDelete(false);
 				getUserSchedules();
 			})
 			.catch((error) => {
-				setError(error.response.statusText);
+				setErrorDelete(error.response.statusText);
+			});
+	};
+
+	const [openRename, setOpenRename] = React.useState(false);
+	const [scheduleToRename, setScheduleToRename] = React.useState();
+	const renameValue = React.useRef();
+	const [errorRename, setErrorRename] = React.useState("");
+
+	const handleScheduleToRename = async (scheduleName) => {
+		setErrorRename("");
+		await axios
+			.post("/renameUserSchedule", {
+				currentUser: currentUser.email,
+				scheduleName: scheduleName,
+				newScheduleName: renameValue.current.value,
+				currentDate: currentDate,
+			})
+			.then(() => {
+				setOpenRename(false);
+				getUserSchedules();
+			})
+			.catch((error) => {
+				setErrorRename(error.response.statusText);
 			});
 	};
 
@@ -200,7 +227,15 @@ const ScheduleCards = () => {
 										<CardActions style={{ float: "right", marginTop: "-3%" }}>
 											<IconButton
 												onClick={() => {
-													setOpen(true);
+													setOpenRename(true);
+													setScheduleToRename(value.scheduleName);
+												}}
+											>
+												<EditIcon />
+											</IconButton>
+											<IconButton
+												onClick={() => {
+													setOpenDelete(true);
 													setScheduleToDelete(value.scheduleName);
 												}}
 											>
@@ -240,12 +275,13 @@ const ScheduleCards = () => {
 					{paddedGridsArray.map((value) => value)}
 				</>
 			)}
+
 			<Dialog
-				open={open}
+				open={openDelete}
 				onClose={() => {
-					setOpen(false);
+					setOpenDelete(false);
 					setScheduleToDelete();
-					setError("");
+					setErrorDelete("");
 				}}
 				PaperProps={{
 					style: {
@@ -259,9 +295,9 @@ const ScheduleCards = () => {
 					dividers
 					style={{ fontFamily: "Source Sans Pro", marginTop: "-2%" }}
 				>
-					{error && (
+					{errorDelete && (
 						<Alert severity="error">
-							<AlertTitle>{error}</AlertTitle>
+							<AlertTitle>{errorDelete}</AlertTitle>
 						</Alert>
 					)}
 					Are you sure you want to remove this schedule?
@@ -269,9 +305,9 @@ const ScheduleCards = () => {
 				<DialogActions>
 					<Button
 						onClick={() => {
-							setOpen(false);
+							setOpenDelete(false);
 							setScheduleToDelete();
-							setError("");
+							setErrorDelete("");
 						}}
 						color="primary"
 					>
@@ -284,6 +320,65 @@ const ScheduleCards = () => {
 						color="primary"
 					>
 						Confirm
+					</Button>
+				</DialogActions>
+			</Dialog>
+
+			<Dialog
+				open={openRename}
+				onClose={() => {
+					setOpenRename(false);
+					setScheduleToRename();
+					setErrorRename("");
+				}}
+				PaperProps={{
+					style: {
+						borderRadius: 20,
+						backgroundColor: "#ebf0fa",
+					},
+				}}
+			>
+				<DialogTitle style={{ width: "400px" }}>Rename</DialogTitle>
+				<DialogContent
+					dividers
+					style={{ fontFamily: "Source Sans Pro", marginTop: "-2%" }}
+				>
+					{errorRename && (
+						<Alert severity="error" style={{ marginBottom: "5%" }}>
+							<AlertTitle>{errorRename}</AlertTitle>
+						</Alert>
+					)}
+					<Grid container>
+						<Grid item xs={12}>
+							<Grid container>
+								<TextField
+									variant="outlined"
+									label={scheduleToRename}
+									fullWidth
+									inputRef={renameValue}
+								/>
+							</Grid>
+						</Grid>
+					</Grid>
+				</DialogContent>
+				<DialogActions>
+					<Button
+						onClick={() => {
+							setOpenRename(false);
+							setScheduleToRename();
+							setErrorRename("");
+						}}
+						color="primary"
+					>
+						Cancel
+					</Button>
+					<Button
+						onClick={() => {
+							handleScheduleToRename(scheduleToRename);
+						}}
+						color="primary"
+					>
+						Rename
 					</Button>
 				</DialogActions>
 			</Dialog>
