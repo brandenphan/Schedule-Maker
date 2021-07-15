@@ -3,15 +3,18 @@ import {
 	Grid,
 	Fade,
 	Button,
+	Typography,
+	CircularProgress,
 	Dialog,
 	DialogTitle,
 	DialogContent,
-	DialogActions,
 	IconButton,
-	Typography,
-	CircularProgress,
+	withStyles,
+	Switch,
+	TextField,
 } from "@material-ui/core";
 import ErrorIcon from "@material-ui/icons/Error";
+import CloseIcon from "@material-ui/icons/Close";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import SettingsMenu from "../Dashboard/SettingsMenu";
@@ -20,6 +23,20 @@ import AddItem from "./AddItem";
 import axios from "axios";
 import moment from "moment";
 import { useAuth } from "../UserAuth/context/AuthContext";
+
+const StyledSwitch = withStyles({
+	switchBase: {
+		color: "#dfe7fb",
+		"&$checked": {
+			color: "#6a8fec",
+		},
+		"&$checked + $track": {
+			backgroundColor: "#6a8fec",
+		},
+	},
+	checked: {},
+	track: {},
+})(Switch);
 
 const BackgroundContainer = styled.div`
 	background: linear-gradient(to left, #e6e6f0, #e9edf7);
@@ -86,12 +103,14 @@ const getAppointmentsReducer = (state, action) => {
 };
 
 const SchedulePage = () => {
+	const [open, setOpen] = React.useState(false);
 	const history = useHistory();
 	const { currentUser } = useAuth();
 	const [currentSchedule, dispatchCurrentSchedule] = React.useReducer(
 		getPersistenceReducer,
 		{ data: [], isLoading: true, isError: false }
 	);
+	const currentDate = moment().format("LLLL");
 
 	const getPersistence = async () => {
 		dispatchCurrentSchedule({ type: "DATA_P_LOADING" });
@@ -120,7 +139,7 @@ const SchedulePage = () => {
 	const dateObject = new Date(2021, 2, 1, 1);
 	const beginningDate = moment(dateObject);
 	let date = beginningDate.date;
-	const currentDate = moment();
+	const [hoursShown, setHoursShown] = React.useState(false);
 
 	const makeTodayAppointment = (startDate, endDate) => {
 		const days = moment(startDate).diff(endDate, "days");
@@ -165,7 +184,7 @@ const SchedulePage = () => {
 					},
 				})
 				.then((data) => {
-					const appointmentsData = data.data.map(
+					const appointmentsData = data.data.scheduleInformation.map(
 						({ startDate, endDate, ...restArgs }) => {
 							const result = {
 								...makeTodayAppointment(startDate, endDate),
@@ -177,6 +196,8 @@ const SchedulePage = () => {
 						}
 					);
 
+					setHoursShown(data.data.showAllHours);
+
 					dispatchAppointments({
 						type: "DATA_LOADING_SUCCESS",
 						payload: appointmentsData,
@@ -185,6 +206,69 @@ const SchedulePage = () => {
 		} catch {
 			dispatchAppointments({ type: "DATA_LOADING_FAILURE" });
 		}
+	};
+
+	const changeScheduleSettings = async () => {
+		let currentScheduleForData;
+
+		await axios
+			.get("/getUserPersistence", {
+				params: { currentUser: currentUser.email },
+			})
+			.then((data) => {
+				currentScheduleForData = data.data;
+			});
+
+		await axios.post("/changeScheduleSettings", {
+			currentUser: currentUser.email,
+			currentSchedule: currentScheduleForData,
+			showAllHours: hoursShown,
+			currentDate: currentDate,
+		});
+	};
+
+	const newScheduleName = React.useRef();
+
+	const changeScheduleName = async () => {
+		let currentScheduleForData;
+
+		await axios
+			.get("/getUserPersistence", {
+				params: { currentUser: currentUser.email },
+			})
+			.then((data) => {
+				currentScheduleForData = data.data;
+			});
+
+		await axios
+			.post("/renameSchedule", {
+				currentUser: currentUser.email,
+				currentSchedule: currentScheduleForData,
+				newScheduleName: newScheduleName.current.value,
+				currentDate: currentDate,
+			})
+			.then(async () => {
+				await axios.post("/setCurrentSchedulePersistence", {
+					currentUser: currentUser.email,
+					scheduleName: newScheduleName.current.value,
+				});
+
+				getScheduleData();
+
+				await axios
+					.get("/getUserPersistence", {
+						params: { currentUser: currentUser.email },
+					})
+					.then((data) => {
+						dispatchCurrentSchedule({
+							type: "DATA_P_LOADING_SUCCESS",
+							payload: data.data,
+						});
+					});
+			})
+			.catch((error) => {
+				window.alert(error.response.statusText);
+			});
 	};
 
 	React.useEffect(() => {
@@ -210,13 +294,41 @@ const SchedulePage = () => {
 						</Grid>
 					</Fade>
 				</Grid>
-				<Grid item xs={10}>
+				<Grid item xs={1} />
+				<Grid item xs={3} style={{ marginTop: "1%", marginLeft: "-2%" }}>
+					<Fade in={true} timeout={1000}>
+						<TextField
+							variant="standard"
+							label={currentSchedule.data}
+							style={{ width: "90%" }}
+							inputRef={newScheduleName}
+						/>
+					</Fade>
+				</Grid>
+				<Grid item xs={1} style={{ marginTop: "1.5%" }}>
+					<Fade in={true} timeout={1000}>
+						<Button
+							variant="contained"
+							style={{
+								backgroundColor: "#7899ed",
+								color: "white",
+								marginTop: "1.1%",
+							}}
+							onClick={() => {
+								changeScheduleName();
+							}}
+						>
+							Save
+						</Button>
+					</Fade>
+				</Grid>
+				<Grid item xs={5}>
 					<Fade in={true} timeout={1000}>
 						<Grid
 							container
 							justify="flex-end"
 							style={{
-								marginTop: "1%",
+								marginTop: "2.3%",
 								marginLeft: "-2%",
 							}}
 						>
@@ -225,7 +337,21 @@ const SchedulePage = () => {
 								getScheduleData={getScheduleData}
 							/>
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-							<Button style={{ color: "#6a8fec", marginTop: "0.5%" }}>
+							<Button
+								onClick={() => {
+									console.log("EDITING");
+								}}
+								style={{ color: "#6a8fec", marginTop: "0.5%" }}
+							>
+								Edit Item
+							</Button>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<Button
+								onClick={() => {
+									setOpen(true);
+								}}
+								style={{ color: "#6a8fec", marginTop: "0.5%" }}
+							>
 								Schedule Settings
 							</Button>
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -276,11 +402,63 @@ const SchedulePage = () => {
 							</Grid>
 						</Grid>
 					) : (
-						<ScheduleTable appointments={appointments} />
+						<ScheduleTable
+							appointments={appointments}
+							showAllHours={hoursShown}
+						/>
 					)}
 					&nbsp;
 				</Grid>
 			</Grid>
+
+			<Dialog
+				onClose={() => {
+					setOpen(false);
+				}}
+				open={open}
+				PaperProps={{
+					style: { borderRadius: 20, backgroundColor: "#ebf0fa" },
+				}}
+			>
+				<DialogTitle>
+					<Grid container>
+						<Grid item xs={6} style={{ marginTop: "2%", width: "300px" }}>
+							Schedule Settings
+						</Grid>
+						<Grid item xs={6}>
+							<Grid container justify="flex-end">
+								<IconButton
+									onClick={() => {
+										setOpen(false);
+									}}
+								>
+									<CloseIcon />
+								</IconButton>
+							</Grid>
+						</Grid>
+					</Grid>
+				</DialogTitle>
+				<DialogContent dividers>
+					<Grid container>
+						<Grid item xs={6}>
+							<Grid container justify="flex-start">
+								<Typography>Show All Hours</Typography>
+							</Grid>
+						</Grid>
+						<Grid item xs={6}>
+							<Grid container justify="flex-end">
+								<StyledSwitch
+									checked={hoursShown}
+									onChange={(event) => {
+										setHoursShown(event.target.checked);
+										changeScheduleSettings();
+									}}
+								/>
+							</Grid>
+						</Grid>
+					</Grid>
+				</DialogContent>
+			</Dialog>
 		</BackgroundContainer>
 	);
 };

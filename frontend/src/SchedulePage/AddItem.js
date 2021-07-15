@@ -272,7 +272,7 @@ const AddItem = ({ currentSchedule, getScheduleData }) => {
 							<Grid item xs={6}>
 								<Grid container justify="center">
 									<TextField
-										id="time"
+										id="startTime"
 										label="Start Time"
 										type="time"
 										defaultValue="09:30"
@@ -289,7 +289,7 @@ const AddItem = ({ currentSchedule, getScheduleData }) => {
 							<Grid item xs={6}>
 								<Grid container justify="center">
 									<TextField
-										id="time"
+										id="endTime"
 										label="End Time"
 										type="time"
 										defaultValue="10:30"

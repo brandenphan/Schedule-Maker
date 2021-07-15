@@ -9,6 +9,7 @@ import {
 	Grid,
 	TextField,
 	Button,
+	Typography,
 } from "@material-ui/core";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import AddIcon from "@material-ui/icons/Add";
@@ -47,13 +48,11 @@ const AddCard = () => {
 				currentUser: currentUser.email,
 			})
 			.then(() => {
-				setOpen(false);
+				handleSchedulePersistence(scheduleNameRef.current.value);
 			})
 			.catch((error) => {
 				setError(error.response.statusText);
 			});
-
-		handleSchedulePersistence(scheduleNameRef.current.value);
 	};
 
 	return (
@@ -65,7 +64,11 @@ const AddCard = () => {
 				}}
 			>
 				<CardContent>
+					<Typography variant="subtitle2">&nbsp;</Typography>
+					<Typography variant="subtitle2">&nbsp;</Typography>
 					<AddIcon />
+					<Typography>&nbsp;</Typography>
+					<Typography variant="subtitle2">&nbsp;</Typography>
 				</CardContent>
 			</CardActionArea>
 
@@ -80,7 +83,7 @@ const AddCard = () => {
 			>
 				<DialogTitle>
 					<Grid container>
-						<Grid item xs={6} style={{ marginTop: "3%" }}>
+						<Grid item xs={6} style={{ marginTop: "3%", width: "300px" }}>
 							Add Schedule
 						</Grid>
 						<Grid item xs={6}>
