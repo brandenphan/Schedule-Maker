@@ -31,7 +31,7 @@ const StyledSwitch = withStyles({
 	track: {},
 })(Switch);
 
-const AddItem = ({ currentSchedule, getScheduleData }) => {
+const AddItem = ({ currentSchedule, getScheduleData, setUpdateEditItems }) => {
 	const { currentUser } = useAuth();
 	const itemNameRef = React.useRef();
 	const [open, setOpen] = React.useState(false);
@@ -188,6 +188,7 @@ const AddItem = ({ currentSchedule, getScheduleData }) => {
 				.then(() => {
 					setOpen(false);
 					getScheduleData();
+					setUpdateEditItems(itemNameRef.current.value);
 				})
 				.catch((error) => {
 					setError(error.response.statusText);
@@ -224,7 +225,7 @@ const AddItem = ({ currentSchedule, getScheduleData }) => {
 			>
 				<DialogTitle>
 					<Grid container>
-						<Grid item xs={6} style={{ marginTop: "2%" }}>
+						<Grid item xs={6} style={{ marginTop: "2.5%" }}>
 							Add Item
 						</Grid>
 						<Grid item xs={6}>

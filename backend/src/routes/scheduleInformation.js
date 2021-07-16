@@ -47,74 +47,6 @@ router.get("/getScheduleInformation", async (req, res) => {
 	}
 });
 
-router.post("/addScheduleEvent", async (req, res) => {
-	if (successfulDatabaseConnection === false) {
-		res.statusMessage = "Failed to connect to database, please try again later";
-		res.status(503).end();
-	} else {
-		const scheduleName = req.body.scheduleName;
-		const itemName = req.body.itemName;
-		const scheduleEventData = req.body.information;
-		const currentUser = req.body.currentUser;
-		const currentDate = req.body.currentDate;
-
-		const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser);
-
-		let duplicateTitle = false;
-
-		await Schedule.find({ scheduleName: scheduleName })
-			.exec()
-			.then((data) => {
-				data[0].scheduleEvents.forEach((itemData) => {
-					if (itemData.title.toLowerCase() === itemName.toLowerCase()) {
-						duplicateTitle = true;
-					}
-				});
-			});
-
-		if (duplicateTitle === true) {
-			res.statusMessage = "Duplicate Item name";
-			res.status(400).end();
-		} else {
-			let updatedEvents = [];
-			let showAllHours;
-			await Schedule.find({ scheduleName: scheduleName })
-				.exec()
-				.then((data) => {
-					scheduleEventData.forEach((newData) => {
-						updatedEvents.push(newData);
-					});
-
-					data[0].scheduleEvents.forEach((itemData) => {
-						updatedEvents.push(itemData);
-					});
-
-					showAllHours = data[0].showAllHours;
-				});
-
-			await Schedule.deleteOne({ scheduleName: scheduleName })
-				.exec()
-				.then(() => {
-					console.log("Deleted successfully");
-				});
-
-			const schedule = new Schedule({
-				scheduleName: scheduleName,
-				currentDate: currentDate,
-				type: "TimeTable",
-				scheduleEvents: updatedEvents,
-				showAllHours: showAllHours,
-			});
-
-			schedule.save().then(() => {
-				console.log("Saved successfully");
-			});
-
-			res.send("Item added successfully");
-		}
-	}
-});
-
 router.post("/changeScheduleSettings", async (req, res) => {
 	if (successfulDatabaseConnection === false) {
 		res.statusMessage = "Failed to connect to database, please try again later";
@@ -198,6 +130,173 @@ router.post("/renameSchedule", async (req, res) => {
 
 			res.send("Successfully changed schedule name");
 		}
+	}
+});
+
+router.get("/getEachScheduleEvent", async (req, res) => {
+	if (successfulDatabaseConnection === false) {
+		res.statusMessage = "Failed to connect to database, please try again later";
+		res.status(503).end();
+	} else {
+		const currentUser = req.query.currentUser;
+		const currentSchedule = req.query.currentSchedule;
+		let listEvents = [];
+
+		const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser);
+
+		await Schedule.find({ scheduleName: currentSchedule })
+			.exec()
+			.then((specificSchedule) => {
+				specificSchedule[0].scheduleEvents.forEach((event, index) => {
+					if (index === 0) {
+						let eventDate = [];
+						eventDate.push(event.startDate.day);
+
+						let eventJSON = {
+							title: event.title,
+							startTimeHour: event.startDate.startTimeHourKey,
+							startTimeMinute: event.startDate.startTimeMinuteKey,
+							endTimeHour: event.endDate.endTimeHourKey,
+							endTimeMinute: event.endDate.endTimeMinuteKey,
+							days: eventDate,
+						};
+
+						listEvents.push(eventJSON);
+					} else {
+						let duplicate = false;
+
+						for (let i = 0; i < listEvents.length; i++) {
+							if (listEvents[i].title === event.title) {
+								listEvents[i].days.push(event.startDate.day);
+								duplicate = true;
+								break;
+							}
+						}
+
+						if (duplicate === false) {
+							let eventDate = [];
+							eventDate.push(event.startDate.day);
+
+							let eventJSON = {
+								title: event.title,
+								startTimeHour: event.startDate.startTimeHourKey,
+								startTimeMinute: event.startDate.startTimeMinuteKey,
+								endTimeHour: event.endDate.endTimeHourKey,
+								endTimeMinute: event.endDate.endTimeMinuteKey,
+								days: eventDate,
+							};
+							listEvents.push(eventJSON);
+						}
+					}
+				});
+			});
+
+		res.send(listEvents);
+	}
+});
+
+router.post("/addScheduleEvent", async (req, res) => {
+	if (successfulDatabaseConnection === false) {
+		res.statusMessage = "Failed to connect to database, please try again later";
+		res.status(503).end();
+	} else {
+		const scheduleName = req.body.scheduleName;
+		const itemName = req.body.itemName;
+		const scheduleEventData = req.body.information;
+		const currentUser = req.body.currentUser;
+		const currentDate = req.body.currentDate;
+
+		const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser);
+
+		let duplicateTitle = false;
+
+		await Schedule.find({ scheduleName: scheduleName })
+			.exec()
+			.then((data) => {
+				data[0].scheduleEvents.forEach((itemData) => {
+					if (itemData.title.toLowerCase() === itemName.toLowerCase()) {
+						duplicateTitle = true;
+					}
+				});
+			});
+
+		if (duplicateTitle === true) {
+			res.statusMessage = "Duplicate Item name";
+			res.status(400).end();
+		} else {
+			let updatedEvents = [];
+			let showAllHours;
+			await Schedule.find({ scheduleName: scheduleName })
+				.exec()
+				.then((data) => {
+					scheduleEventData.forEach((newData) => {
+						updatedEvents.push(newData);
+					});
+
+					data[0].scheduleEvents.forEach((itemData) => {
+						updatedEvents.push(itemData);
+					});
+
+					showAllHours = data[0].showAllHours;
+				});
+
+			await Schedule.deleteOne({ scheduleName: scheduleName })
+				.exec()
+				.then(() => {
+					console.log("Deleted successfully");
+				});
+
+			const schedule = new Schedule({
+				scheduleName: scheduleName,
+				currentDate: currentDate,
+				type: "TimeTable",
+				scheduleEvents: updatedEvents,
+				showAllHours: showAllHours,
+			});
+
+			schedule.save().then(() => {
+				console.log("Saved successfully");
+			});
+
+			res.send("Item added successfully");
+		}
+	}
+});
+
+router.post("/deleteScheduleEvent", async (req, res) => {
+	if (successfulDatabaseConnection === false) {
+		res.statusMessage = "Failed to connect to database, please try again later";
+		res.status(503).end();
+	} else {
+		const currentUser = req.body.currentUser;
+		const currentSchedule = req.body.currentSchedule;
+		const currentDate = req.body.currentDate;
+		const eventName = req.body.eventName;
+
+		const Schedule = mongoose.model("Schedule", scheduleSchema, currentUser);
+
+		const foundSchedule = await Schedule.find({
+			scheduleName: currentSchedule,
+		});
+		await Schedule.deleteMany({ scheduleName: currentSchedule });
+
+		let newSchedule = [];
+		foundSchedule[0].scheduleEvents.forEach((data, index) => {
+			if (data.title !== eventName) {
+				newSchedule.push(data);
+			}
+		});
+
+		const updatedSchedule = new Schedule({
+			scheduleName: foundSchedule[0].scheduleName,
+			currentDate: currentDate,
+			type: "TimeTable",
+			scheduleEvents: newSchedule,
+			showAllHours: foundSchedule[0].showAllHours,
+		});
+		updatedSchedule.save();
+
+		res.send("Successfully deleted event");
 	}
 });
 
