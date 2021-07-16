@@ -12,6 +12,7 @@ import {
 	CardContent,
 	CardActions,
 	CircularProgress,
+	Zoom,
 } from "@material-ui/core";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import CloseIcon from "@material-ui/icons/Close";
@@ -113,7 +114,7 @@ const EditItem = ({ updateEditItems, getScheduleData }) => {
 				currentDate: currentDate,
 				eventName: eventName,
 			})
-			.then((data) => {
+			.then(() => {
 				getScheduleEvents();
 				getScheduleData();
 				setOpenDelete(false);
@@ -212,48 +213,50 @@ const EditItem = ({ updateEditItems, getScheduleData }) => {
 								{scheduleEvents.data.map((value) => (
 									<Grid item xs={4} key={value.title}>
 										<div style={{ padding: "5%" }}>
-											<Card style={{ borderRadius: "20px" }}>
-												<CardContent>
-													<Typography variant="h6">{value.title}</Typography>
-													<Typography>{`${value.startTimeHour}:${value.startTimeMinute} - ${value.endTimeHour}:${value.endTimeMinute}`}</Typography>
-													<Grid container>
-														<Grid item xs={12} style={{ height: "120px" }}>
-															{value.days.map((dayValue) => (
-																<div key={dayValue}>
-																	{dayValue === 1 && (
-																		<Typography>Monday</Typography>
-																	)}
-																	{dayValue === 2 && (
-																		<Typography>Tuesday</Typography>
-																	)}
-																	{dayValue === 3 && (
-																		<Typography>Wednesday</Typography>
-																	)}
-																	{dayValue === 4 && (
-																		<Typography>Thursday</Typography>
-																	)}
-																	{dayValue === 5 && (
-																		<Typography>Friday</Typography>
-																	)}
-																</div>
-															))}
+											<Zoom in={true} timeout={800}>
+												<Card style={{ borderRadius: "20px" }}>
+													<CardContent>
+														<Typography variant="h6">{value.title}</Typography>
+														<Typography>{`${value.startTimeHour}:${value.startTimeMinute} - ${value.endTimeHour}:${value.endTimeMinute}`}</Typography>
+														<Grid container>
+															<Grid item xs={12} style={{ height: "120px" }}>
+																{value.days.map((dayValue) => (
+																	<div key={dayValue}>
+																		{dayValue === 1 && (
+																			<Typography>Monday</Typography>
+																		)}
+																		{dayValue === 2 && (
+																			<Typography>Tuesday</Typography>
+																		)}
+																		{dayValue === 3 && (
+																			<Typography>Wednesday</Typography>
+																		)}
+																		{dayValue === 4 && (
+																			<Typography>Thursday</Typography>
+																		)}
+																		{dayValue === 5 && (
+																			<Typography>Friday</Typography>
+																		)}
+																	</div>
+																))}
+															</Grid>
 														</Grid>
-													</Grid>
-												</CardContent>
-												<CardActions
-													style={{ float: "right", marginTop: "-3%" }}
-												>
-													<IconButton
-														onClick={() => {
-															setEventToDelete(value.title);
-															setOpenDelete(true);
-															setDeleteError("");
-														}}
+													</CardContent>
+													<CardActions
+														style={{ float: "right", marginTop: "-3%" }}
 													>
-														<DeleteIcon />
-													</IconButton>
-												</CardActions>
-											</Card>
+														<IconButton
+															onClick={() => {
+																setEventToDelete(value.title);
+																setOpenDelete(true);
+																setDeleteError("");
+															}}
+														>
+															<DeleteIcon />
+														</IconButton>
+													</CardActions>
+												</Card>
+											</Zoom>
 										</div>
 									</Grid>
 								))}
