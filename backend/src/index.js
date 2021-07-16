@@ -39,31 +39,6 @@ app.use("/", userPersistenceRoutes);
 app.use("/", userSchedulesRoutes);
 app.use("/", scheduleInformationRoutes);
 
-// app.post("/setUserSettings", async (req, res) => {
-// 	if (successfulDatabaseConnection === false) {
-// 		res.statusMessage = "Failed to connect to database, please try again later";
-// 		res.status(503).end();
-// 	} else {
-// 		const currentUser = req.body.currentUser;
-// 		const darkModeBoolean = req.body.darkModeBoolean;
-// 		const Settings = mongoose.model(
-// 			"UserSettings",
-// 			userSettingsSchema,
-// 			currentUser
-// 		);
-
-// 		await Settings.deleteMany({ type: "UserSettings" });
-
-// 		const newSettings = Settings({
-// 			darkMode: darkModeBoolean,
-// 			type: "UserSettings",
-// 		});
-// 		newSettings.save();
-
-// 		res.send("Updated user profile successfully");
-// 	}
-// });
-
 app.listen(PORT, () => {
 	console.log(`Server listening on ${PORT}`);
 });
