@@ -48,5 +48,5 @@
 			"last 1 safari version"
 		]
 	},
-	"proxy": "https://schedule-maker-backend.herokuapp.com/"
+	"proxy": "http://localhost:3001"
 }
