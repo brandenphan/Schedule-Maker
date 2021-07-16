@@ -20,6 +20,7 @@ import { useHistory } from "react-router-dom";
 import SettingsMenu from "../Dashboard/SettingsMenu";
 import ScheduleTable from "./ScheduleTable";
 import AddItem from "./AddItem";
+import EditItem from "./EditItem";
 import axios from "axios";
 import moment from "moment";
 import { useAuth } from "../UserAuth/context/AuthContext";
@@ -111,6 +112,7 @@ const SchedulePage = () => {
 		{ data: [], isLoading: true, isError: false }
 	);
 	const currentDate = moment().format("LLLL");
+	const [updateEditItems, setUpdateEditItems] = React.useState();
 
 	const getPersistence = async () => {
 		dispatchCurrentSchedule({ type: "DATA_P_LOADING" });
@@ -335,16 +337,13 @@ const SchedulePage = () => {
 							<AddItem
 								currentSchedule={currentSchedule.data}
 								getScheduleData={getScheduleData}
+								setUpdateEditItems={setUpdateEditItems}
 							/>
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-							<Button
-								onClick={() => {
-									console.log("EDITING");
-								}}
-								style={{ color: "#6a8fec", marginTop: "0.5%" }}
-							>
-								Edit Item
-							</Button>
+							<EditItem
+								updateEditItems={updateEditItems}
+								getScheduleData={getScheduleData}
+							/>
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 							<Button
 								onClick={() => {
