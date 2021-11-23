@@ -1,6 +1,6 @@
 # General Information
 
-This project is a full stack web-application written in JavaScript. The front-end utilizes the React framework and Material UI library for front-end components while the back-end uses the Node.js environment paired with the Express framework to allow for various API calls from the frontend for data transfer/manipulation. Uses Firebase to securely handle and store all user authentication paired with Mongoose schemas to store all other user information within MongoDB. Implemented Gitflow to handle for version control utilizing various branches such as main, develop, features, and release.
+This project is a full stack web-application written in JavaScript. The front-end utilizes the React framework and Material UI library for front-end components while the back-end uses the Node.js environment paired with the Express framework to allow for various API calls from the frontend for data transfer/manipulation. Uses Firebase to securely handle and store all user authentication paired with Mongoose schemas to store all other user information within MongoDB. Implemented Gitflow to handle version control utilizing various branches such as main, develop, features, and release provided by Gitflow.
 
 
 # Features
