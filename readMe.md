@@ -39,6 +39,8 @@ This project is a full stack web-application written in JavaScript. The front-en
 
 - Express framework
 
+- Git/Gitflow
+
 # Website Preview
 
 ![image](https://user-images.githubusercontent.com/82501158/142956281-bd86e8ff-0c8b-48d2-9189-445aa72a759e.png)
