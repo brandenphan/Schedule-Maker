@@ -7,37 +7,37 @@ This project is a full stack web-application written in JavaScript. The front-en
 
 - Create account
 
-Log into an account
+- Log into an account
 
-Forgot password to an account
+- Forgot password to an account
 
-Changing an account password once logged in
+- Changing an account password once logged in
 
-Creating a new schedule
+- Creating a new schedule
 
-Delete a schedule
+- Delete a schedule
 
-Rename a schedule
+- Rename a schedule
 
-Add/Delete events to the schedule timeline
+- Add/Delete events to the schedule timeline
 
-Change schedule settings (10-hour and 24-hour timelines)
+- Change schedule settings (10-hour and 24-hour timelines)
 
 # Technologies 
 
-JavaScript
+- JavaScript
 
-React framework
+- React framework
 
-Material UI styling library
+- Material UI styling library
 
-Google firebase
+- Google firebase
 
-Mongoose/MongoDB
+- Mongoose/MongoDB
 
-Node.js
+- Node.js
 
-Express framework
+- Express framework
 
 # Website Preview
 
