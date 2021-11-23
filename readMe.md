@@ -43,20 +43,15 @@ Express framework
 
 # Website Preview
 
-Landing Page
 ![image](https://user-images.githubusercontent.com/82501158/142956281-bd86e8ff-0c8b-48d2-9189-445aa72a759e.png)
 
-Login Page
 ![image](https://user-images.githubusercontent.com/82501158/142956293-fe4c099e-ebad-49ea-9bb7-6609bdd56577.png)
 
-Dashboard Page
 ![image](https://user-images.githubusercontent.com/82501158/142956321-955409b6-ea3c-48b2-bd50-466487e5000a.png)
 
-Schedule Page
 ![image](https://user-images.githubusercontent.com/82501158/142956372-3d7b9324-0105-4098-a93c-b761e8bf846c.png)
 ![image](https://user-images.githubusercontent.com/82501158/142956396-f95a8f23-b608-40e7-bfaf-2caf22a31733.png)
-![image](https://user-images.githubusercontent.com/82501158/142956415-351743e5-b0e7-47d1-88c4-c7b593d9d2fa.png)
-![image](https://user-images.githubusercontent.com/82501158/142956439-25ae1c27-885a-4115-881d-34b45b89e4d6.png)
+![image](https://user-images.githubusercontent.com/82501158/142956415-351743e5-b0e7-47d1-88c4-c7b593d9d2fa.png)![image](https://user-images.githubusercontent.com/82501158/142956439-25ae1c27-885a-4115-881d-34b45b89e4d6.png)
 
 
 
